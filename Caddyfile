@@ -1,5 +1,5 @@
-:80 {
-    root * /srv
+:{$PORT:80} {
+    root * /app
     file_server
-    try_files {path} {path}.html index.html
+    try_files {path} {path}.html /index.html
 }
