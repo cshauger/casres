@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "id": "sub_1774581890194",
+    "firstName": "Test",
+    "lastName": "User",
+    "phone": "+15551234567",
+    "providerName": "Provider",
+    "providerPhone": "+15559876543",
+    "consentGiven": true,
+    "consentTimestamp": "2026-03-27T03:24:50.194Z",
+    "consentIp": "52.8.230.75",
+    "status": "active",
+    "source": "web_optin",
+    "createdAt": "2026-03-27T03:24:50.194Z",
+    "lastCheckInSent": null,
+    "lastResponseReceived": null,
+    "totalCheckInsSent": 0,
+    "totalResponsesReceived": 0
+  }
+]
