@@ -1,10 +1,36 @@
 /**
- * Add subscriber - Simple version without KV (uses in-memory for demo)
- * For production, set up Vercel KV or use a real database
+ * Add subscriber - JSON file storage using Vercel Blob
  */
 
-// In-memory storage (resets on cold start - demo only!)
-const subscribers = new Map();
+import { put, list } from '@vercel/blob';
+
+const BLOB_KEY = 'subscribers.json';
+
+async function getSubscribers() {
+  try {
+    const { blobs } = await list({ prefix: BLOB_KEY });
+    if (blobs.length === 0) return [];
+    
+    const blob = blobs[0];
+    const response = await fetch(blob.url);
+    return await response.json();
+  } catch (error) {
+    console.error('Error reading subscribers:', error);
+    return [];
+  }
+}
+
+async function saveSubscribers(subscribers) {
+  try {
+    await put(BLOB_KEY, JSON.stringify(subscribers, null, 2), {
+      access: 'public',
+      contentType: 'application/json'
+    });
+  } catch (error) {
+    console.error('Error saving subscribers:', error);
+    throw error;
+  }
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -53,14 +79,17 @@ export default async function handler(req, res) {
     const formattedPhone = cleanPhone.length === 10 ? `+1${cleanPhone}` : `+${cleanPhone}`;
     const formattedProviderPhone = cleanProviderPhone.length === 10 ? `+1${cleanProviderPhone}` : `+${cleanProviderPhone}`;
 
+    // Get existing subscribers
+    const subscribers = await getSubscribers();
+
     // Check for duplicate
-    if (subscribers.has(formattedPhone)) {
-      const existing = subscribers.get(formattedPhone);
+    const duplicate = subscribers.find(s => s.phone === formattedPhone);
+    if (duplicate) {
       return res.status(400).json({
         error: 'Phone number already registered',
         existingSubscriber: {
-          name: `${existing.firstName} ${existing.lastName}`,
-          status: existing.status
+          name: `${duplicate.firstName} ${duplicate.lastName}`,
+          status: duplicate.status
         }
       });
     }
@@ -76,19 +105,27 @@ export default async function handler(req, res) {
       providerPhone: formattedProviderPhone,
       consentGiven: true,
       consentTimestamp: new Date().toISOString(),
+      consentIp: req.headers['x-forwarded-for'] || req.socket.remoteAddress,
       status: 'active',
-      createdAt: new Date().toISOString()
+      source: req.body.source || 'web_optin',
+      createdAt: new Date().toISOString(),
+      lastCheckInSent: null,
+      lastResponseReceived: null,
+      totalCheckInsSent: 0,
+      totalResponsesReceived: 0
     };
 
-    subscribers.set(formattedPhone, subscriber);
+    // Add to array and save
+    subscribers.push(subscriber);
+    await saveSubscribers(subscribers);
 
     console.log(`New subscriber added: ${subscriberId} (${formattedPhone})`);
-    console.log(`⚠️ Using in-memory storage (demo only). Set up Vercel KV for production.`);
+    console.log(`Total subscribers: ${subscribers.length}`);
 
     return res.status(201).json({
       success: true,
       welcomeMessageSent: false,
-      note: 'Demo mode - data stored in memory only. Configure Twilio and Vercel KV for production.',
+      note: 'Subscriber saved. Configure Twilio to enable welcome SMS.',
       subscriber: {
         id: subscriber.id,
         name: `${firstName} ${lastName}`,
