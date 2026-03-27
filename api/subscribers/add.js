@@ -97,8 +97,33 @@ export default async function handler(req, res) {
 
     console.log(`New subscriber added: ${subscriberId} (${formattedPhone})`);
 
+    // Send welcome SMS (if Twilio is configured)
+    let welcomeMessageSent = false;
+    if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER) {
+      try {
+        const twilio = require('twilio');
+        const twilioClient = twilio(
+          process.env.TWILIO_ACCOUNT_SID,
+          process.env.TWILIO_AUTH_TOKEN
+        );
+
+        await twilioClient.messages.create({
+          to: formattedPhone,
+          from: process.env.TWILIO_PHONE_NUMBER,
+          body: `Hi ${firstName}! Welcome to CasRes wellness check-ins. You'll receive 3 check-ins daily (8am, 2pm, 8pm). Simply reply "OK" to each one. Your caregiver (${providerName}) will be notified if you don't respond. Reply STOP to unsubscribe anytime. 💙`
+        });
+
+        welcomeMessageSent = true;
+        console.log(`Welcome SMS sent to ${formattedPhone}`);
+      } catch (twilioError) {
+        console.error('Failed to send welcome SMS:', twilioError.message);
+        // Continue anyway - subscriber is registered
+      }
+    }
+
     return res.status(201).json({
       success: true,
+      welcomeMessageSent,
       subscriber: {
         id: subscriber.id,
         name: `${firstName} ${lastName}`,

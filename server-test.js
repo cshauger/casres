@@ -111,11 +111,18 @@ const server = createServer(async (req, res) => {
 
         console.log('\n✅ New Subscriber Added:');
         console.log(JSON.stringify(subscriber, null, 2));
-        console.log(`\nTotal subscribers: ${subscribers.length}\n`);
+        console.log(`\nTotal subscribers: ${subscribers.length}`);
+        
+        // Mock welcome SMS
+        const welcomeMsg = `Hi ${subscriber.firstName}! Welcome to CasRes wellness check-ins. You'll receive 3 check-ins daily (8am, 2pm, 8pm). Simply reply "OK" to each one. Your caregiver (${subscriber.providerName}) will be notified if you don't respond. Reply STOP to unsubscribe anytime. 💙`;
+        console.log('\n📱 Mock Welcome SMS:');
+        console.log(`   To: ${formattedPhone}`);
+        console.log(`   Message: ${welcomeMsg}\n`);
 
         res.writeHead(201, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           success: true,
+          welcomeMessageSent: true,
           subscriber: {
             id: subscriber.id,
             name: `${subscriber.firstName} ${subscriber.lastName}`,
@@ -140,9 +147,10 @@ const server = createServer(async (req, res) => {
   res.end('Not Found');
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`\n🦀 CasRes Test Server Running`);
   console.log(`\n📱 Open in browser: http://localhost:${PORT}`);
+  console.log(`   Or externally: http://<your-ip>:${PORT}`);
   console.log(`\nThis is a local test server. API calls are mocked.`);
   console.log(`Subscribers are stored in memory (cleared on restart).\n`);
 });

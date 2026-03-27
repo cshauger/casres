@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Test</title>
+</head>
+<body>
+    <h1>Debug Form Test</h1>
+    <form id="testForm">
+        <input type="text" id="name" placeholder="Name" required><br><br>
+        <input type="tel" id="phone" placeholder="Phone" required><br><br>
+        <button type="submit">Submit</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('testForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Submitting...';
+            
+            try {
+                console.log('Starting fetch...');
+                const response = await fetch('/api/subscribers/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': 'PUBLIC_OPTIN'
+                    },
+                    body: JSON.stringify({
+                        firstName: document.getElementById('name').value,
+                        lastName: 'Test',
+                        phone: document.getElementById('phone').value,
+                        providerName: 'Provider',
+                        providerPhone: '5559876543',
+                        consent: true
+                    })
+                });
+                
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                resultDiv.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = '<strong>Error:</strong> ' + error.message;
+            }
+        });
+    </script>
+</body>
+</html>

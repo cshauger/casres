@@ -397,10 +397,17 @@
         <!-- Success Message (hidden by default) -->
         <div id="successMessage" class="success-message">
             <h2>✓ You're All Set!</h2>
-            <p style="margin-top: 20px;">Thank you for signing up. You'll receive your first wellness check-in at the next scheduled time (8am, 2pm, or 8pm).</p>
-            <p style="margin-top: 25px; font-size: 16px; opacity: 0.9;">
-                Remember: Simply reply <strong>"OK"</strong> to each check-in.<br>
-                Reply <strong>"STOP"</strong> to unsubscribe anytime.
+            <p style="margin-top: 20px; font-size: 20px;"><strong id="subscriberName"></strong>, welcome to CasRes wellness check-ins!</p>
+            <p style="margin-top: 20px;">
+                📱 <strong>Check your phone</strong> — we just sent you a welcome text message.
+            </p>
+            <p style="margin-top: 15px;">
+                You'll receive wellness check-ins at <strong>8am, 2pm, and 8pm</strong> daily.<br>
+                Simply reply <strong>"OK"</strong> to each one.
+            </p>
+            <p style="margin-top: 15px; font-size: 16px; opacity: 0.9;">
+                If you don't respond within 4 hours, we'll alert <strong id="caregiverName"></strong>.<br>
+                Reply <strong>"STOP"</strong> anytime to unsubscribe.
             </p>
         </div>
     </div>
@@ -432,18 +439,17 @@
             };
             
             // Validate phone numbers
-            const phoneRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
             const cleanPhone = formData.phone.replace(/\D/g, '');
             const cleanProviderPhone = formData.providerPhone.replace(/\D/g, '');
             
-            if (!phoneRegex.test(cleanPhone)) {
-                errorText.textContent = 'Please enter a valid phone number for yourself.';
+            if (cleanPhone.length !== 10 && cleanPhone.length !== 11) {
+                errorText.textContent = 'Please enter a valid 10-digit phone number for yourself.';
                 errorMessage.classList.add('show');
                 return;
             }
             
-            if (!phoneRegex.test(cleanProviderPhone)) {
-                errorText.textContent = 'Please enter a valid phone number for your caregiver.';
+            if (cleanProviderPhone.length !== 10 && cleanProviderPhone.length !== 11) {
+                errorText.textContent = 'Please enter a valid 10-digit phone number for your caregiver.';
                 errorMessage.classList.add('show');
                 return;
             }
@@ -476,6 +482,8 @@
                 }
                 
                 // Success! Hide form and show success message
+                document.getElementById('subscriberName').textContent = formData.firstName;
+                document.getElementById('caregiverName').textContent = formData.providerName;
                 formCard.style.display = 'none';
                 successMessage.classList.add('show');
                 
@@ -492,7 +500,15 @@
                 
             } catch (error) {
                 console.error('Error:', error);
-                errorText.textContent = error.message || 'Something went wrong. Please try again or contact support.';
+                let errorMsg = 'Something went wrong. ';
+                if (error.message) {
+                    errorMsg += error.message;
+                } else if (!navigator.onLine) {
+                    errorMsg += 'Please check your internet connection.';
+                } else {
+                    errorMsg += 'Please try again or contact support.';
+                }
+                errorText.textContent = errorMsg;
                 errorMessage.classList.add('show');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Start Wellness Check-Ins';
