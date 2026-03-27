@@ -8,7 +8,6 @@
     "deploy": "vercel --prod"
   },
   "dependencies": {
-    "@vercel/blob": "^0.23.0",
     "twilio": "^5.3.7"
   },
   "engines": {

@@ -1,36 +1,8 @@
 /**
- * Add subscriber - JSON file storage using Vercel Blob
+ * Add subscriber - JSON file storage using GitHub
  */
 
-import { put, list } from '@vercel/blob';
-
-const BLOB_KEY = 'subscribers.json';
-
-async function getSubscribers() {
-  try {
-    const { blobs } = await list({ prefix: BLOB_KEY });
-    if (blobs.length === 0) return [];
-    
-    const blob = blobs[0];
-    const response = await fetch(blob.url);
-    return await response.json();
-  } catch (error) {
-    console.error('Error reading subscribers:', error);
-    return [];
-  }
-}
-
-async function saveSubscribers(subscribers) {
-  try {
-    await put(BLOB_KEY, JSON.stringify(subscribers, null, 2), {
-      access: 'public',
-      contentType: 'application/json'
-    });
-  } catch (error) {
-    console.error('Error saving subscribers:', error);
-    throw error;
-  }
-}
+import { getSubscribers, saveSubscribers } from '../../lib/github-storage.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

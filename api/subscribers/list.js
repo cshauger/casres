@@ -1,24 +1,8 @@
 /**
- * List all subscribers from JSON blob storage
+ * List all subscribers from GitHub storage
  */
 
-import { list } from '@vercel/blob';
-
-const BLOB_KEY = 'subscribers.json';
-
-async function getSubscribers() {
-  try {
-    const { blobs } = await list({ prefix: BLOB_KEY });
-    if (blobs.length === 0) return [];
-    
-    const blob = blobs[0];
-    const response = await fetch(blob.url);
-    return await response.json();
-  } catch (error) {
-    console.error('Error reading subscribers:', error);
-    return [];
-  }
-}
+import { getSubscribers } from '../../lib/github-storage.js';
 
 export default async function handler(req, res) {
   // Simple API key auth (same as add endpoint for now)
