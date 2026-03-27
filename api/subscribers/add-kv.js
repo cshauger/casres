@@ -1,18 +1,19 @@
 /**
- * Add subscriber - Simple version without KV (uses in-memory for demo)
- * For production, set up Vercel KV or use a real database
+ * Add a new subscriber to the wellness check-in service
  */
 
-// In-memory storage (resets on cold start - demo only!)
-const subscribers = new Map();
+import { kv } from '@vercel/kv';
+import { randomUUID } from 'crypto';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Simple API key auth
+  // Simple API key auth (replace with better auth in production)
   const apiKey = req.headers['x-api-key'];
+  
+  // Allow public opt-ins via web form OR admin API access
   const isPublicOptin = apiKey === 'PUBLIC_OPTIN';
   const isAdminAccess = apiKey === process.env.ADMIN_API_KEY;
   
@@ -53,20 +54,26 @@ export default async function handler(req, res) {
     const formattedPhone = cleanPhone.length === 10 ? `+1${cleanPhone}` : `+${cleanPhone}`;
     const formattedProviderPhone = cleanProviderPhone.length === 10 ? `+1${cleanProviderPhone}` : `+${cleanProviderPhone}`;
 
-    // Check for duplicate
-    if (subscribers.has(formattedPhone)) {
-      const existing = subscribers.get(formattedPhone);
+    // Check for duplicate phone number
+    const existingKeys = await kv.keys('subscriber:*');
+    const existingSubscribers = await Promise.all(
+      existingKeys.map(key => kv.get(key))
+    );
+
+    const duplicate = existingSubscribers.find(s => s && s.phone === formattedPhone);
+    if (duplicate) {
       return res.status(400).json({
         error: 'Phone number already registered',
         existingSubscriber: {
-          name: `${existing.firstName} ${existing.lastName}`,
-          status: existing.status
+          id: duplicate.id,
+          name: `${duplicate.firstName} ${duplicate.lastName}`,
+          status: duplicate.status
         }
       });
     }
 
     // Create subscriber
-    const subscriberId = `sub_${Date.now()}`;
+    const subscriberId = randomUUID();
     const subscriber = {
       id: subscriberId,
       firstName,
@@ -76,19 +83,47 @@ export default async function handler(req, res) {
       providerPhone: formattedProviderPhone,
       consentGiven: true,
       consentTimestamp: new Date().toISOString(),
+      consentIp: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
       status: 'active',
-      createdAt: new Date().toISOString()
+      source: req.body.source || 'admin_api',
+      createdAt: new Date().toISOString(),
+      lastCheckInSent: null,
+      lastResponseReceived: null,
+      totalCheckInsSent: 0,
+      totalResponsesReceived: 0
     };
 
-    subscribers.set(formattedPhone, subscriber);
+    await kv.set(`subscriber:${subscriberId}`, subscriber);
 
     console.log(`New subscriber added: ${subscriberId} (${formattedPhone})`);
-    console.log(`⚠️ Using in-memory storage (demo only). Set up Vercel KV for production.`);
+
+    // Send welcome SMS (if Twilio is configured)
+    let welcomeMessageSent = false;
+    if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER) {
+      try {
+        const twilio = require('twilio');
+        const twilioClient = twilio(
+          process.env.TWILIO_ACCOUNT_SID,
+          process.env.TWILIO_AUTH_TOKEN
+        );
+
+        await twilioClient.messages.create({
+          to: formattedPhone,
+          from: process.env.TWILIO_PHONE_NUMBER,
+          body: `Hi ${firstName}! Welcome to CasRes wellness check-ins. You'll receive 3 check-ins daily (8am, 2pm, 8pm). Simply reply "OK" to each one. Your caregiver (${providerName}) will be notified if you don't respond. Reply STOP to unsubscribe anytime. 💙`
+        });
+
+        welcomeMessageSent = true;
+        console.log(`Welcome SMS sent to ${formattedPhone}`);
+      } catch (twilioError) {
+        console.error('Failed to send welcome SMS:', twilioError.message);
+        // Continue anyway - subscriber is registered
+      }
+    }
 
     return res.status(201).json({
       success: true,
-      welcomeMessageSent: false,
-      note: 'Demo mode - data stored in memory only. Configure Twilio and Vercel KV for production.',
+      welcomeMessageSent,
       subscriber: {
         id: subscriber.id,
         name: `${firstName} ${lastName}`,
