@@ -12,7 +12,12 @@ export default async function handler(req, res) {
 
   // Simple API key auth (replace with better auth in production)
   const apiKey = req.headers['x-api-key'];
-  if (apiKey !== process.env.ADMIN_API_KEY) {
+  
+  // Allow public opt-ins via web form OR admin API access
+  const isPublicOptin = apiKey === 'PUBLIC_OPTIN';
+  const isAdminAccess = apiKey === process.env.ADMIN_API_KEY;
+  
+  if (!isPublicOptin && !isAdminAccess) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 

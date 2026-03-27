@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CasRes - Healthcare Text Message Service</title>
-    <meta name="description" content="Opt in to receive helpful healthcare reminders and updates via text message.">
+    <title>CasRes - Wellness Check-In Service</title>
+    <meta name="description" content="Automated wellness check-ins for peace of mind.">
     
     <style>
         * {
@@ -17,11 +17,12 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
             line-height: 1.6;
             color: #1a1a1a;
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
 
         .container {
-            max-width: 600px;
+            max-width: 650px;
             margin: 0 auto;
             padding: 40px 20px;
         }
@@ -29,25 +30,26 @@
         .header {
             text-align: center;
             margin-bottom: 40px;
+            color: white;
         }
 
         .logo {
-            font-size: 42px;
+            font-size: 48px;
             font-weight: bold;
-            color: #2563eb;
             margin-bottom: 10px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
         .tagline {
-            font-size: 20px;
-            color: #6b7280;
+            font-size: 22px;
+            opacity: 0.95;
         }
 
         .card {
             background: white;
-            border-radius: 12px;
-            padding: 40px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            padding: 45px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             margin-bottom: 30px;
         }
 
@@ -71,11 +73,11 @@
         }
 
         .benefits {
-            background: #eff6ff;
-            border-left: 4px solid #2563eb;
-            padding: 20px;
+            background: #f0f9ff;
+            border-left: 4px solid #0ea5e9;
+            padding: 25px;
             margin: 30px 0;
-            border-radius: 6px;
+            border-radius: 8px;
         }
 
         .benefits ul {
@@ -90,12 +92,10 @@
         }
 
         .benefits li:before {
-            content: "✓";
+            content: "💙";
             position: absolute;
             left: 0;
-            color: #2563eb;
-            font-weight: bold;
-            font-size: 20px;
+            font-size: 18px;
         }
 
         .form-group {
@@ -108,6 +108,12 @@
             font-weight: 600;
             margin-bottom: 8px;
             color: #1a1a1a;
+        }
+
+        label .hint {
+            font-weight: 400;
+            font-size: 14px;
+            color: #6b7280;
         }
 
         input[type="text"],
@@ -123,14 +129,14 @@
         input[type="text"]:focus,
         input[type="tel"]:focus {
             outline: none;
-            border-color: #2563eb;
+            border-color: #667eea;
         }
 
         .checkbox-group {
             margin: 30px 0;
-            padding: 20px;
+            padding: 25px;
             background: #fef3c7;
-            border-radius: 8px;
+            border-radius: 10px;
             border: 2px solid #f59e0b;
         }
 
@@ -139,7 +145,7 @@
             align-items: flex-start;
             cursor: pointer;
             font-size: 16px;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         input[type="checkbox"] {
@@ -157,42 +163,48 @@
             font-size: 20px;
             font-weight: bold;
             color: white;
-            background: #2563eb;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
 
         .submit-btn:hover {
-            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
         }
 
         .submit-btn:disabled {
             background: #9ca3af;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .legal {
             font-size: 14px;
             color: #6b7280;
-            margin-top: 20px;
-            line-height: 1.5;
+            margin-top: 25px;
+            line-height: 1.6;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
         }
 
         .legal a {
-            color: #2563eb;
+            color: #667eea;
             text-decoration: underline;
         }
 
         .success-message {
             display: none;
-            background: #d1fae5;
-            border: 2px solid #10b981;
-            border-radius: 8px;
-            padding: 30px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 16px;
+            padding: 40px;
             text-align: center;
-            margin-top: 20px;
+            color: white;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         }
 
         .success-message.show {
@@ -200,12 +212,13 @@
         }
 
         .success-message h2 {
-            color: #065f46;
-            margin-bottom: 10px;
+            font-size: 32px;
+            margin-bottom: 15px;
         }
 
         .success-message p {
-            color: #047857;
+            font-size: 18px;
+            opacity: 0.95;
         }
 
         .error-message {
@@ -228,7 +241,7 @@
             }
 
             .card {
-                padding: 25px 20px;
+                padding: 30px 20px;
             }
 
             h1 {
@@ -238,6 +251,10 @@
             h2 {
                 font-size: 22px;
             }
+
+            .logo {
+                font-size: 36px;
+            }
         }
     </style>
 </head>
@@ -246,33 +263,35 @@
         <!-- Header -->
         <div class="header">
             <div class="logo">CasRes</div>
-            <p class="tagline">Healthcare Text Message Service</p>
+            <p class="tagline">Wellness Check-In Service</p>
         </div>
 
         <!-- Main Card -->
-        <div class="card">
-            <h1>Stay Connected with Your Healthcare Team</h1>
+        <div class="card" id="formCard">
+            <h1>Stay Safe, Stay Connected</h1>
             
-            <p>Sign up to receive helpful reminders, health tips, and important updates via text message.</p>
+            <p>Sign up for automated wellness check-ins. We'll text you three times a day to make sure you're doing well. If you don't respond, we'll notify your caregiver.</p>
 
             <div class="benefits">
-                <h2>What You'll Receive:</h2>
+                <h2>How It Works:</h2>
                 <ul>
-                    <li>Appointment reminders</li>
-                    <li>Medication reminders</li>
-                    <li>Health tips and wellness information</li>
-                    <li>Important updates from your care team</li>
+                    <li>Receive 3 wellness check-ins daily (morning, afternoon, evening)</li>
+                    <li>Simply reply "OK" to each check-in</li>
+                    <li>If you don't respond, your caregiver gets notified</li>
+                    <li>Reply "STOP" anytime to unsubscribe</li>
                 </ul>
             </div>
 
             <!-- Error Message -->
             <div id="errorMessage" class="error-message">
-                <strong>Please fix the following:</strong>
+                <strong>⚠️ Please fix the following:</strong>
                 <p id="errorText"></p>
             </div>
 
             <!-- Opt-In Form -->
             <form id="optinForm">
+                <h2 style="margin-bottom: 20px;">Your Information</h2>
+                
                 <div class="form-group">
                     <label for="firstName">First Name *</label>
                     <input 
@@ -296,13 +315,47 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="phone">Mobile Phone Number *</label>
+                    <label for="phone">
+                        Your Mobile Phone Number *
+                        <span class="hint">(where you'll receive check-ins)</span>
+                    </label>
                     <input 
                         type="tel" 
                         id="phone" 
                         name="phone" 
                         required
                         placeholder="(555) 123-4567"
+                        pattern="[0-9\s\(\)\-\+]+"
+                    >
+                </div>
+
+                <h2 style="margin: 30px 0 20px 0;">Your Caregiver</h2>
+
+                <div class="form-group">
+                    <label for="providerName">
+                        Caregiver Name *
+                        <span class="hint">(who should we contact if you don't respond?)</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="providerName" 
+                        name="providerName" 
+                        required
+                        placeholder="Enter caregiver's name"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="providerPhone">
+                        Caregiver Phone Number *
+                        <span class="hint">(where we'll send alerts)</span>
+                    </label>
+                    <input 
+                        type="tel" 
+                        id="providerPhone" 
+                        name="providerPhone" 
+                        required
+                        placeholder="(555) 987-6543"
                         pattern="[0-9\s\(\)\-\+]+"
                     >
                 </div>
@@ -317,25 +370,26 @@
                             required
                         >
                         <span>
-                            <strong>I agree to receive text messages</strong> from CasRes at the phone number provided above. 
-                            I understand that I will receive approximately <strong>3 messages per day</strong> (up to 90 messages per month). 
+                            <strong>I agree to receive wellness check-in text messages</strong> from CasRes at the phone number provided above. 
+                            I understand that I will receive <strong>3 messages per day</strong> (up to 90 messages per month). 
+                            If I don't respond within 4 hours, my caregiver will be notified.
                             Message and data rates may apply. 
-                            I can reply <strong>STOP</strong> to unsubscribe or <strong>HELP</strong> for assistance at any time.
+                            I can reply <strong>STOP</strong> to unsubscribe at any time.
                         </span>
                     </label>
                 </div>
 
                 <button type="submit" class="submit-btn" id="submitBtn">
-                    Sign Up for Text Messages
+                    Start Wellness Check-Ins
                 </button>
 
                 <!-- Legal Disclaimer -->
                 <div class="legal">
                     By submitting this form, you consent to receive automated text messages from CasRes. 
                     Consent is not a condition of receiving services. 
-                    Message frequency varies. Message and data rates may apply. 
+                    You will receive approximately 3 messages per day. Message and data rates may apply. 
                     Reply STOP to opt-out or HELP for help. 
-                    See our <a href="/privacy">Privacy Policy</a> and <a href="/terms">Terms of Service</a>.
+                    See our <a href="/privacy.html">Privacy Policy</a> and <a href="/terms.html">Terms of Service</a>.
                 </div>
             </form>
         </div>
@@ -343,9 +397,10 @@
         <!-- Success Message (hidden by default) -->
         <div id="successMessage" class="success-message">
             <h2>✓ You're All Set!</h2>
-            <p>Thank you for signing up. You'll start receiving text messages from your healthcare team soon.</p>
-            <p style="margin-top: 15px; font-size: 16px;">
-                Remember: Reply <strong>STOP</strong> to unsubscribe or <strong>HELP</strong> for assistance.
+            <p style="margin-top: 20px;">Thank you for signing up. You'll receive your first wellness check-in at the next scheduled time (8am, 2pm, or 8pm).</p>
+            <p style="margin-top: 25px; font-size: 16px; opacity: 0.9;">
+                Remember: Simply reply <strong>"OK"</strong> to each check-in.<br>
+                Reply <strong>"STOP"</strong> to unsubscribe anytime.
             </p>
         </div>
     </div>
@@ -358,7 +413,7 @@
             const submitBtn = document.getElementById('submitBtn');
             const errorMessage = document.getElementById('errorMessage');
             const errorText = document.getElementById('errorText');
-            const form = document.getElementById('optinForm');
+            const formCard = document.getElementById('formCard');
             const successMessage = document.getElementById('successMessage');
             
             // Clear previous errors
@@ -369,14 +424,26 @@
                 firstName: document.getElementById('firstName').value.trim(),
                 lastName: document.getElementById('lastName').value.trim(),
                 phone: document.getElementById('phone').value.trim(),
+                providerName: document.getElementById('providerName').value.trim(),
+                providerPhone: document.getElementById('providerPhone').value.trim(),
                 consent: document.getElementById('consent').checked,
+                source: 'web_optin',
                 timestamp: new Date().toISOString()
             };
             
-            // Validate phone number
+            // Validate phone numbers
             const phoneRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
-            if (!phoneRegex.test(formData.phone.replace(/\D/g, ''))) {
-                errorText.textContent = 'Please enter a valid phone number.';
+            const cleanPhone = formData.phone.replace(/\D/g, '');
+            const cleanProviderPhone = formData.providerPhone.replace(/\D/g, '');
+            
+            if (!phoneRegex.test(cleanPhone)) {
+                errorText.textContent = 'Please enter a valid phone number for yourself.';
+                errorMessage.classList.add('show');
+                return;
+            }
+            
+            if (!phoneRegex.test(cleanProviderPhone)) {
+                errorText.textContent = 'Please enter a valid phone number for your caregiver.';
                 errorMessage.classList.add('show');
                 return;
             }
@@ -393,63 +460,67 @@
             submitBtn.textContent = 'Submitting...';
             
             try {
-                // TODO: Replace with your actual API endpoint
-                const response = await fetch('/api/optin', {
+                const response = await fetch('/api/subscribers/add', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'x-api-key': 'PUBLIC_OPTIN' // Special key for public opt-ins
                     },
                     body: JSON.stringify(formData)
                 });
                 
+                const data = await response.json();
+                
                 if (!response.ok) {
-                    throw new Error('Submission failed');
+                    throw new Error(data.error || 'Submission failed');
                 }
                 
                 // Success! Hide form and show success message
-                form.style.display = 'none';
+                formCard.style.display = 'none';
                 successMessage.classList.add('show');
                 
-                // Optional: Send to Google Analytics, etc.
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // Optional: Send to analytics
                 if (typeof gtag !== 'undefined') {
                     gtag('event', 'form_submission', {
-                        'event_category': 'optin',
-                        'event_label': 'sms_consent'
+                        'event_category': 'wellness_checkin',
+                        'event_label': 'subscriber_optin'
                     });
                 }
                 
             } catch (error) {
                 console.error('Error:', error);
-                errorText.textContent = 'Something went wrong. Please try again or contact support.';
+                errorText.textContent = error.message || 'Something went wrong. Please try again or contact support.';
                 errorMessage.classList.add('show');
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Sign Up for Text Messages';
+                submitBtn.textContent = 'Start Wellness Check-Ins';
+                
+                // Scroll to error
+                errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         });
         
-        // Phone number formatting
-        document.getElementById('phone').addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            
-            if (value.length > 0) {
-                if (value.length <= 3) {
-                    e.target.value = `(${value}`;
-                } else if (value.length <= 6) {
-                    e.target.value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
-                } else {
-                    e.target.value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6, 10)}`;
+        // Phone number formatting for both fields
+        function formatPhoneNumber(input) {
+            input.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                
+                if (value.length > 0) {
+                    if (value.length <= 3) {
+                        e.target.value = `(${value}`;
+                    } else if (value.length <= 6) {
+                        e.target.value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+                    } else {
+                        e.target.value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6, 10)}`;
+                    }
                 }
-            }
-        });
-    </script>
-</body>
-</html>
-lue = `(${value.slice(0, 3)}) ${value.slice(3)}`;
-                } else {
-                    e.target.value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6, 10)}`;
-                }
-            }
-        });
+            });
+        }
+        
+        formatPhoneNumber(document.getElementById('phone'));
+        formatPhoneNumber(document.getElementById('providerPhone'));
     </script>
 </body>
 </html>
