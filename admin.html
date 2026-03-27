@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CasRes Admin - Subscribers</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            flex: 1;
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        .search {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        thead {
+            background: #f8f9fa;
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #333;
+        }
+
+        tr:hover {
+            background: #f9f9f9;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status.active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status.inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .phone {
+            font-family: 'Courier New', monospace;
+        }
+
+        .date {
+            font-size: 13px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 CasRes Subscribers</h1>
+        <p style="color: #666; margin-bottom: 30px;">Wellness check-in subscriber management</p>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3>Total Subscribers</h3>
+                <div class="value" id="totalCount">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Active</h3>
+                <div class="value" id="activeCount">-</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <input type="text" class="search" id="searchInput" placeholder="Search by name or phone...">
+            <button onclick="loadSubscribers()">🔄 Refresh</button>
+            <button onclick="downloadCSV()">📥 Export CSV</button>
+        </div>
+
+        <div id="errorMessage" class="error" style="display: none;"></div>
+        <div id="loading" class="loading">Loading subscribers...</div>
+        <div id="empty" class="empty" style="display: none;">No subscribers yet.</div>
+
+        <table id="subscribersTable" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Caregiver</th>
+                    <th>Caregiver Phone</th>
+                    <th>Status</th>
+                    <th>Enrolled</th>
+                </tr>
+            </thead>
+            <tbody id="subscribersBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        let allSubscribers = [];
+
+        async function loadSubscribers() {
+            const loading = document.getElementById('loading');
+            const errorMessage = document.getElementById('errorMessage');
+            const table = document.getElementById('subscribersTable');
+            const empty = document.getElementById('empty');
+
+            loading.style.display = 'block';
+            errorMessage.style.display = 'none';
+            table.style.display = 'none';
+            empty.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/subscribers/list', {
+                    headers: {
+                        'x-api-key': 'PUBLIC_OPTIN' // Using same key for simplicity
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load subscribers');
+                }
+
+                const data = await response.json();
+                allSubscribers = data.subscribers || [];
+
+                loading.style.display = 'none';
+
+                if (allSubscribers.length === 0) {
+                    empty.style.display = 'block';
+                } else {
+                    renderTable(allSubscribers);
+                }
+
+                updateStats();
+
+            } catch (error) {
+                console.error('Error:', error);
+                loading.style.display = 'none';
+                errorMessage.textContent = 'Error loading subscribers: ' + error.message;
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        function renderTable(subscribers) {
+            const tbody = document.getElementById('subscribersBody');
+            const table = document.getElementById('subscribersTable');
+
+            tbody.innerHTML = '';
+
+            subscribers.forEach(sub => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${sub.firstName} ${sub.lastName}</strong></td>
+                    <td class="phone">${sub.phone}</td>
+                    <td>${sub.providerName || 'N/A'}</td>
+                    <td class="phone">${sub.providerPhone || 'N/A'}</td>
+                    <td><span class="status ${sub.status}">${sub.status}</span></td>
+                    <td class="date">${new Date(sub.createdAt).toLocaleDateString()}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            table.style.display = 'table';
+        }
+
+        function updateStats() {
+            const total = allSubscribers.length;
+            const active = allSubscribers.filter(s => s.status === 'active').length;
+
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('activeCount').textContent = active;
+        }
+
+        function downloadCSV() {
+            if (allSubscribers.length === 0) {
+                alert('No data to export');
+                return;
+            }
+
+            const headers = ['First Name', 'Last Name', 'Phone', 'Caregiver Name', 'Caregiver Phone', 'Status', 'Enrolled Date'];
+            const rows = allSubscribers.map(sub => [
+                sub.firstName,
+                sub.lastName,
+                sub.phone,
+                sub.providerName || '',
+                sub.providerPhone || '',
+                sub.status,
+                new Date(sub.createdAt).toISOString()
+            ]);
+
+            const csv = [
+                headers.join(','),
+                ...rows.map(row => row.map(field => `"${field}"`).join(','))
+            ].join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `casres-subscribers-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = allSubscribers.filter(sub => 
+                sub.firstName.toLowerCase().includes(query) ||
+                sub.lastName.toLowerCase().includes(query) ||
+                sub.phone.includes(query) ||
+                (sub.providerName && sub.providerName.toLowerCase().includes(query))
+            );
+            renderTable(filtered);
+        });
+
+        // Load on page load
+        loadSubscribers();
+    </script>
+</body>
+</html>

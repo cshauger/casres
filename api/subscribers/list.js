@@ -1,13 +1,29 @@
 /**
- * List all subscribers with optional status filter
+ * List all subscribers from JSON blob storage
  */
 
-import { kv } from '@vercel/kv';
+import { list } from '@vercel/blob';
+
+const BLOB_KEY = 'subscribers.json';
+
+async function getSubscribers() {
+  try {
+    const { blobs } = await list({ prefix: BLOB_KEY });
+    if (blobs.length === 0) return [];
+    
+    const blob = blobs[0];
+    const response = await fetch(blob.url);
+    return await response.json();
+  } catch (error) {
+    console.error('Error reading subscribers:', error);
+    return [];
+  }
+}
 
 export default async function handler(req, res) {
-  // Simple API key auth
+  // Simple API key auth (same as add endpoint for now)
   const apiKey = req.headers['x-api-key'];
-  if (apiKey !== process.env.ADMIN_API_KEY) {
+  if (apiKey !== 'PUBLIC_OPTIN' && apiKey !== process.env.ADMIN_API_KEY) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
@@ -15,13 +31,7 @@ export default async function handler(req, res) {
     const { status } = req.query;
 
     // Get all subscribers
-    const subscriberKeys = await kv.keys('subscriber:*');
-    let subscribers = await Promise.all(
-      subscriberKeys.map(key => kv.get(key))
-    );
-
-    // Filter out null values
-    subscribers = subscribers.filter(s => s !== null);
+    let subscribers = await getSubscribers();
 
     // Apply status filter if provided
     if (status) {
@@ -34,7 +44,8 @@ export default async function handler(req, res) {
     // Return sanitized data
     const sanitizedSubscribers = subscribers.map(s => ({
       id: s.id,
-      name: `${s.firstName} ${s.lastName}`,
+      firstName: s.firstName,
+      lastName: s.lastName,
       phone: s.phone,
       providerName: s.providerName,
       providerPhone: s.providerPhone,
@@ -43,10 +54,7 @@ export default async function handler(req, res) {
       lastCheckInSent: s.lastCheckInSent,
       lastResponseReceived: s.lastResponseReceived,
       totalCheckInsSent: s.totalCheckInsSent || 0,
-      totalResponsesReceived: s.totalResponsesReceived || 0,
-      responseRate: s.totalCheckInsSent > 0
-        ? ((s.totalResponsesReceived / s.totalCheckInsSent) * 100).toFixed(1) + '%'
-        : 'N/A'
+      totalResponsesReceived: s.totalResponsesReceived || 0
     }));
 
     return res.status(200).json({
