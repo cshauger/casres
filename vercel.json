@@ -1,5 +1,15 @@
 {
   "version": 2,
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "crons": [
+    {
+      "path": "/api/checkin/send",
+      "schedule": "0 8,14,20 * * *"
+    },
+    {
+      "path": "/api/checkin/alert",
+      "schedule": "*/30 * * * *"
+    }
+  ]
 }
