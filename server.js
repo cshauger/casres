@@ -44,6 +44,19 @@ app.post('/api/subscribers/add', async (req, res) => {
     }
 
     const subscribers = await getSubscribers();
+    
+    // Check for duplicate phone number
+    const normalizePhone = (phone) => phone ? phone.replace(/\D/g, '') : '';
+    const phoneNormalized = normalizePhone(formattedPhone);
+    const existing = subscribers.find(s => normalizePhone(s.phone) === phoneNormalized);
+    
+    if (existing) {
+      return res.status(400).json({ 
+        error: 'Phone number already registered',
+        message: `This phone number is already registered. If you need to update your information, please contact support.`
+      });
+    }
+    
     const subscriberId = `sub_${Date.now()}`;
     const linkToken = Buffer.from(`${subscriberId}:${Date.now()}`).toString('base64').replace(/[=+\/]/g, '').substring(0, 16);
 

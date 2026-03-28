@@ -503,7 +503,12 @@
                 const data = await response.json();
                 
                 if (!response.ok) {
-                    throw new Error(data.error || 'Submission failed');
+                    const errorText = document.getElementById('errorText');
+                    errorText.textContent = data.message || data.error || 'Submission failed. Please try again.';
+                    errorMessage.classList.add('show');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Sign Up';
+                    return;
                 }
                 
                 // Success! Hide form and show success message
