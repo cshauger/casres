@@ -122,8 +122,8 @@ app.post('/api/telegram/webhook', async (req, res) => {
       }
     }
 
-    // Handle OK response
-    if (textUpper === 'OK' || textUpper === 'OK!' || text === '👍') {
+    // Handle any text response (except commands) as acknowledgement
+    if (text && !text.startsWith('/')) {
       const subscribers = await getSubscribers();
       const subscriber = subscribers.find(s => s.telegramChatId === chatId.toString());
 
@@ -133,7 +133,7 @@ app.post('/api/telegram/webhook', async (req, res) => {
         await saveSubscribers(subscribers);
 
         await sendTelegramMessage(chatId,
-          `✅ Thank you ${subscriber.firstName}! Wellness check-in confirmed. 💙\n\n_Next check-in starts in 1 minute..._`
+          `✅ Thank you ${subscriber.firstName}! Wellness check-in confirmed. 💙`
         );
       }
       return res.status(200).json({ ok: true });
