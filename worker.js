@@ -132,6 +132,29 @@ async function monitorNewActivations() {
         console.log(`New activation detected: ${sub.firstName} (${sub.id})`);
         scheduleCheckIns(sub);
       }
+      
+      // Check if they need a cycle restart (responded to a check-in)
+      if (sub.needsCycleRestart && scheduledTasks.has(sub.id)) {
+        console.log(`Cycle restart requested for ${sub.firstName} (${sub.id})`);
+        
+        // Cancel existing scheduled tasks
+        const tasks = scheduledTasks.get(sub.id);
+        if (tasks) {
+          Object.values(tasks).forEach(timer => clearTimeout(timer));
+          scheduledTasks.delete(sub.id);
+          console.log(`Cancelled pending tasks for ${sub.id}`);
+        }
+        
+        // Clear the restart flag
+        sub.needsCycleRestart = false;
+        await saveSubscribers(subscribers);
+        
+        // Schedule restart in 1 minute
+        setTimeout(() => {
+          console.log(`Restarting cycle for ${sub.firstName} (${sub.id})`);
+          scheduleCheckIns(sub);
+        }, 60000);
+      }
     }
   } catch (error) {
     console.error('Monitor error:', error);

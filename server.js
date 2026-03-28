@@ -130,10 +130,11 @@ app.post('/api/telegram/webhook', async (req, res) => {
       if (subscriber) {
         subscriber.lastResponseReceived = new Date().toISOString();
         subscriber.totalResponsesReceived = (subscriber.totalResponsesReceived || 0) + 1;
+        subscriber.needsCycleRestart = true; // Signal worker to restart cycle
         await saveSubscribers(subscribers);
 
         await sendTelegramMessage(chatId,
-          `✅ Thank you ${subscriber.firstName}! Wellness check-in confirmed. 💙`
+          `✅ Thank you ${subscriber.firstName}! Wellness check-in confirmed. 💙\n\n_Next cycle starts in 1 minute..._`
         );
       }
       return res.status(200).json({ ok: true });
