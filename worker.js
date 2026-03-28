@@ -1,13 +1,21 @@
 /**
- * CasRes Background Worker
- * Automatically schedules and sends test check-ins for new activations
+ * CasRes Background Worker - Production Mode
+ * Sends check-ins at scheduled times (12:30 PM, 1:00 PM, 1:30 PM PT)
  */
 
 import { getSubscribers, saveSubscribers } from './lib/github-storage.js';
 
 const TELEGRAM_TOKEN = process.env.CASRES_BOT_TOKEN;
-const CHECK_INTERVAL = 10000; // Check every 10 seconds
-const scheduledTasks = new Map(); // Track scheduled tasks per subscriber
+const CHECK_INTERVAL = 30000; // Check every 30 seconds
+
+// Check-in times (Pacific Time)
+const CHECK_IN_TIMES = [
+  { hour: 12, minute: 30, number: 1 },
+  { hour: 13, minute: 0, number: 2 },
+  { hour: 13, minute: 30, number: 3 }
+];
+
+const lastSentTimes = new Map(); // Track when we last sent each check-in
 
 async function sendTelegramMessage(chatId, text) {
   try {
@@ -27,10 +35,37 @@ async function sendTelegramMessage(chatId, text) {
   }
 }
 
-async function sendCheckIn(subscriber, checkInNumber) {
+function getCurrentPacificTime() {
+  const now = new Date();
+  // Convert to Pacific Time
+  const pacificTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+  return pacificTime;
+}
+
+function shouldSendCheckIn(checkInTime) {
+  const now = getCurrentPacificTime();
+  const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
+  
+  // Check if we're at the scheduled time (within the check interval window)
+  if (currentHour === checkInTime.hour && currentMinute === checkInTime.minute) {
+    // Check if we already sent this check-in today
+    const today = now.toDateString();
+    const key = `${checkInTime.number}-${today}`;
+    
+    if (!lastSentTimes.has(key)) {
+      lastSentTimes.set(key, Date.now());
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+async function sendCheckInToSubscriber(subscriber, checkInNumber) {
   if (!subscriber.telegramChatId) return;
 
-  const message = `🌟 *Test Check-In #${checkInNumber}*\n\nHi ${subscriber.firstName}!\n\nThis is test check-in #${checkInNumber}.\n\nPlease reply *OK* to confirm you're doing well.\n\n💙 Reply OK to confirm`;
+  const message = `🌟 *Check-In #${checkInNumber}*\n\nHi ${subscriber.firstName}!\n\nPlease reply with any message to confirm you're doing well.\n\n💙 Just send a quick reply`;
 
   console.log(`Sending check-in #${checkInNumber} to ${subscriber.firstName} (${subscriber.id})`);
   
@@ -41,163 +76,106 @@ async function sendCheckIn(subscriber, checkInNumber) {
   const sub = subscribers.find(s => s.id === subscriber.id);
   if (sub) {
     sub.lastCheckInSent = new Date().toISOString();
+    sub.lastCheckInNumber = checkInNumber;
     sub.totalCheckInsSent = (sub.totalCheckInsSent || 0) + 1;
+    
+    // Reset daily response tracking at first check-in
+    if (checkInNumber === 1) {
+      sub.dailyResponseReceived = false;
+    }
+    
     await saveSubscribers(subscribers);
   }
 }
 
-async function sendAlert(subscriber) {
-  // Check if they responded
+async function sendAlertToProvider(subscriber) {
   const subscribers = await getSubscribers();
-  const sub = subscribers.find(s => s.id === subscriber.id);
   
-  if (!sub) return;
+  const alertMessage = `⚠️ *WELLNESS ALERT*\n\n${subscriber.firstName} ${subscriber.lastName} has not responded to any wellness check-ins today.\n\n📱 Phone: ${subscriber.phone}\n⏰ Last check-in sent: ${subscriber.lastCheckInSent || 'Unknown'}\n❌ No response received\n\nPlease call ${subscriber.firstName} to verify their wellbeing.`;
 
-  const lastCheckIn = sub.lastCheckInSent ? new Date(sub.lastCheckInSent) : null;
-  const lastResponse = sub.lastResponseReceived ? new Date(sub.lastResponseReceived) : null;
-
-  if (lastResponse && lastCheckIn && lastResponse > lastCheckIn) {
-    console.log(`Skipping alert for ${sub.firstName} - they responded`);
-    return;
-  }
-
-  console.log(`Sending alert for ${sub.firstName} (${sub.id}) - no response`);
-
-  const alertMessage = `⚠️ *WELLNESS ALERT*\n\n${sub.firstName} ${sub.lastName} has not responded to 3 wellness check-ins.\n\n📱 Phone: ${sub.phone}\n⏰ Last check-in sent: ${lastCheckIn ? lastCheckIn.toLocaleString() : 'Unknown'}\n❌ No response received\n\nPlease call ${sub.firstName} to verify their wellbeing.\n\n_This is a test alert from CasRes wellness check-in service._`;
-
-  // Find provider by phone number and send to their Telegram if connected
-  let providerChatId = null;
-  
-  // Normalize phone numbers (remove all non-digits, handle US country code)
+  // Find provider by phone number
   const normalizePhone = (phone) => {
     if (!phone) return '';
     const digits = phone.replace(/\D/g, '');
-    // If 10 digits, assume US and add 1
     if (digits.length === 10) return '1' + digits;
     return digits;
   };
   
-  const providerPhoneNormalized = normalizePhone(sub.providerPhone);
-  
+  const providerPhoneNormalized = normalizePhone(subscriber.providerPhone);
   const provider = subscribers.find(s => normalizePhone(s.phone) === providerPhoneNormalized);
   
-  if (provider && provider.telegramChatId) {
-    providerChatId = provider.telegramChatId;
-    console.log(`Sending alert to provider ${provider.firstName} via Telegram (${providerChatId})`);
-  } else {
-    // Fallback to hardcoded for testing
-    providerChatId = '8259734518';
-    console.log(`Provider not found in Telegram (searched for ${sub.providerPhone} -> ${providerPhoneNormalized}), sending to default (${providerChatId})`);
-  }
-
+  let providerChatId = provider && provider.telegramChatId ? provider.telegramChatId : '8259734518';
+  
+  console.log(`Sending alert for ${subscriber.firstName} to provider (${providerChatId})`);
   await sendTelegramMessage(providerChatId, alertMessage);
 
   // Update alert tracking
-  sub.lastAlertSent = new Date().toISOString();
-  sub.totalAlertsSent = (sub.totalAlertsSent || 0) + 1;
-  await saveSubscribers(subscribers);
-}
-
-function scheduleCheckIns(subscriber) {
-  // Don't reschedule if already scheduled
-  if (scheduledTasks.has(subscriber.id)) {
-    return;
+  const sub = subscribers.find(s => s.id === subscriber.id);
+  if (sub) {
+    sub.lastAlertSent = new Date().toISOString();
+    sub.totalAlertsSent = (sub.totalAlertsSent || 0) + 1;
+    await saveSubscribers(subscribers);
   }
-
-  console.log(`Scheduling test check-ins for ${subscriber.firstName} (${subscriber.id})`);
-
-  const tasks = {
-    checkin1: setTimeout(() => sendCheckIn(subscriber, 1), 60000),      // 1 min
-    checkin2: setTimeout(() => sendCheckIn(subscriber, 2), 120000),     // 2 min
-    checkin3: setTimeout(() => sendCheckIn(subscriber, 3), 180000),     // 3 min
-    alert: setTimeout(() => sendAlert(subscriber), 240000)              // 4 min
-  };
-
-  scheduledTasks.set(subscriber.id, tasks);
-
-  // Clean up after all tasks complete
-  setTimeout(() => {
-    scheduledTasks.delete(subscriber.id);
-    console.log(`Completed task cycle for ${subscriber.id}`);
-  }, 250000); // Clean up after 4+ minutes
 }
 
-function restartCheckInCycle(subscriber) {
-  // Cancel any existing tasks
-  const existingTasks = scheduledTasks.get(subscriber.id);
-  if (existingTasks) {
-    Object.values(existingTasks).forEach(timer => clearTimeout(timer));
-    scheduledTasks.delete(subscriber.id);
-    console.log(`Cancelled pending tasks for ${subscriber.id}`);
-  }
-
-  console.log(`Restarting check-in cycle for ${subscriber.firstName} (${subscriber.id})`);
-
-  // Schedule new cycle
-  const tasks = {
-    checkin1: setTimeout(() => sendCheckIn(subscriber, 1), 60000),      // 1 min
-    checkin2: setTimeout(() => sendCheckIn(subscriber, 2), 120000),     // 2 min
-    checkin3: setTimeout(() => sendCheckIn(subscriber, 3), 180000),     // 3 min
-    alert: setTimeout(() => sendAlert(subscriber), 240000)              // 4 min
-  };
-
-  scheduledTasks.set(subscriber.id, tasks);
-
-  // Clean up after all tasks complete
-  setTimeout(() => {
-    scheduledTasks.delete(subscriber.id);
-    console.log(`Completed restart cycle for ${subscriber.id}`);
-  }, 250000);
-}
-
-async function monitorNewActivations() {
+async function runScheduledCheckIns() {
   try {
     const subscribers = await getSubscribers();
-
-    for (const sub of subscribers) {
-      // Check if they just activated (has Telegram chat ID but no check-ins sent yet)
-      if (sub.telegramChatId && sub.totalCheckInsSent === 0 && !scheduledTasks.has(sub.id)) {
-        console.log(`New activation detected: ${sub.firstName} (${sub.id})`);
-        scheduleCheckIns(sub);
-      }
-      
-      // Check if they need a cycle restart (responded to a check-in)
-      if (sub.needsCycleRestart) {
-        console.log(`Cycle restart requested for ${sub.firstName} (${sub.id})`);
+    
+    // Check each scheduled time
+    for (const checkInTime of CHECK_IN_TIMES) {
+      if (shouldSendCheckIn(checkInTime)) {
+        console.log(`Triggering check-in #${checkInTime.number} at ${checkInTime.hour}:${String(checkInTime.minute).padStart(2, '0')} PT`);
         
-        // Clear the restart flag
-        sub.needsCycleRestart = false;
-        await saveSubscribers(subscribers);
-        
-        // Use dedicated restart subroutine
-        restartCheckInCycle(sub);
+        // Send to all active subscribers with Telegram connected
+        for (const sub of subscribers) {
+          if (sub.status === 'active' && sub.telegramChatId) {
+            await sendCheckInToSubscriber(sub, checkInTime.number);
+          }
+        }
       }
     }
+    
+    // After 2:00 PM PT, check for missed check-ins and send alerts
+    const now = getCurrentPacificTime();
+    if (now.getHours() === 14 && now.getMinutes() === 0) {
+      const today = now.toDateString();
+      const alertKey = `alert-${today}`;
+      
+      if (!lastSentTimes.has(alertKey)) {
+        lastSentTimes.set(alertKey, Date.now());
+        
+        console.log('Checking for missed check-ins...');
+        const refreshedSubs = await getSubscribers();
+        
+        for (const sub of refreshedSubs) {
+          if (sub.status === 'active' && sub.telegramChatId && !sub.dailyResponseReceived) {
+            console.log(`No response from ${sub.firstName} - sending alert`);
+            await sendAlertToProvider(sub);
+          }
+        }
+      }
+    }
+    
   } catch (error) {
-    console.error('Monitor error:', error);
+    console.error('Scheduler error:', error);
   }
 }
 
 // Main worker loop
 async function start() {
-  console.log('🦀 CasRes Background Worker started');
-  console.log(`Checking for new activations every ${CHECK_INTERVAL / 1000} seconds`);
-
-  // Initial check
-  await monitorNewActivations();
+  console.log('🦀 CasRes Production Worker started');
+  console.log(`Check-in times (Pacific): ${CHECK_IN_TIMES.map(t => `${t.hour}:${String(t.minute).padStart(2, '0')}`).join(', ')}`);
+  console.log(`Alert time: 2:00 PM PT`);
 
   // Run check loop
   setInterval(async () => {
-    await monitorNewActivations();
+    await runScheduledCheckIns();
   }, CHECK_INTERVAL);
 }
 
-// Handle graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('SIGTERM received, cleaning up...');
-  scheduledTasks.forEach((tasks, id) => {
-    Object.values(tasks).forEach(timer => clearTimeout(timer));
-  });
+  console.log('SIGTERM received, shutting down gracefully...');
   process.exit(0);
 });
 

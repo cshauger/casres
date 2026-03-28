@@ -147,11 +147,11 @@ app.post('/api/telegram/webhook', async (req, res) => {
       if (subscriber) {
         subscriber.lastResponseReceived = new Date().toISOString();
         subscriber.totalResponsesReceived = (subscriber.totalResponsesReceived || 0) + 1;
-        subscriber.needsCycleRestart = true; // Signal worker to restart cycle
+        subscriber.dailyResponseReceived = true; // Mark as responded for today
         await saveSubscribers(subscribers);
 
         await sendTelegramMessage(chatId,
-          `✅ Thank you ${subscriber.firstName}! Wellness check-in confirmed. 💙\n\n*⚠️ IF THIS IS A REAL EMERGENCY, CALL 911 IMMEDIATELY*\n\n_Next cycle starts in 1 minute..._`
+          `✅ Thank you ${subscriber.firstName}! Wellness check-in confirmed. 💙\n\n*⚠️ IF THIS IS A REAL EMERGENCY, CALL 911 IMMEDIATELY*\n\n_Next check-in: 12:30 PM, 1:00 PM, or 1:30 PM Pacific_`
         );
       }
       return res.status(200).json({ ok: true });
