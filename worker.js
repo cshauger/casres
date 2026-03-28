@@ -65,7 +65,19 @@ async function sendAlert(subscriber) {
 
   const alertMessage = `⚠️ *WELLNESS ALERT*\n\n${sub.firstName} ${sub.lastName} has not responded to 3 wellness check-ins.\n\n📱 Phone: ${sub.phone}\n⏰ Last check-in sent: ${lastCheckIn ? lastCheckIn.toLocaleString() : 'Unknown'}\n❌ No response received\n\nPlease call ${sub.firstName} to verify their wellbeing.\n\n_This is a test alert from CasRes wellness check-in service._`;
 
-  const providerChatId = '8259734518'; // Curtis for testing
+  // Find provider by phone number and send to their Telegram if connected
+  let providerChatId = null;
+  const provider = subscribers.find(s => s.phone === sub.providerPhone);
+  
+  if (provider && provider.telegramChatId) {
+    providerChatId = provider.telegramChatId;
+    console.log(`Sending alert to provider ${provider.firstName} via Telegram (${providerChatId})`);
+  } else {
+    // Fallback to hardcoded for testing
+    providerChatId = '8259734518';
+    console.log(`Provider not found in Telegram, sending to default (${providerChatId})`);
+  }
+
   await sendTelegramMessage(providerChatId, alertMessage);
 
   // Update alert tracking
