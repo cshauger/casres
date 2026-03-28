@@ -45,9 +45,17 @@ app.post('/api/subscribers/add', async (req, res) => {
 
     const subscribers = await getSubscribers();
     
-    // Format phone numbers (just store as provided for now)
-    const formattedPhone = phone;
-    const formattedProviderPhone = providerPhone;
+    // Standardize phone numbers to E.164 format (+1XXXXXXXXXX for US)
+    const formatToE164 = (phone) => {
+      if (!phone) return phone;
+      const digits = phone.replace(/\D/g, '');
+      if (digits.length === 10) return '+1' + digits;
+      if (digits.length === 11 && digits[0] === '1') return '+' + digits;
+      return '+1' + digits; // fallback
+    };
+    
+    const formattedPhone = formatToE164(phone);
+    const formattedProviderPhone = formatToE164(providerPhone);
     
     // Check for duplicate phone number
     const normalizePhone = (phone) => phone ? phone.replace(/\D/g, '') : '';
