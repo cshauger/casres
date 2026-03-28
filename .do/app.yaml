@@ -1,0 +1,72 @@
+name: casres
+region: sfo
+
+services:
+  - name: web
+    github:
+      repo: cshauger/casres
+      branch: digitalocean-app-platform
+      deploy_on_push: true
+    
+    source_dir: /
+    
+    envs:
+      - key: NODE_ENV
+        value: production
+      - key: GITHUB_TOKEN
+        scope: RUN_TIME
+        type: SECRET
+      - key: AIRTABLE_TOKEN
+        scope: RUN_TIME
+        type: SECRET
+      - key: CASRES_BOT_TOKEN
+        scope: RUN_TIME
+        type: SECRET
+    
+    http_port: 8080
+    
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    
+    routes:
+      - path: /
+    
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 10
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+
+# Cron workers for scheduled check-ins
+workers:
+  - name: morning-checkin
+    github:
+      repo: cshauger/casres
+      branch: digitalocean-app-platform
+      deploy_on_push: true
+    
+    source_dir: /
+    
+    envs:
+      - key: GITHUB_TOKEN
+        scope: RUN_TIME
+        type: SECRET
+      - key: CASRES_BOT_TOKEN
+        scope: RUN_TIME
+        type: SECRET
+    
+    run_command: |
+      # Run at 8am PT daily
+      while true; do
+        current_hour=$(TZ=America/Los_Angeles date +%H)
+        if [ "$current_hour" = "08" ]; then
+          curl -s -X POST http://localhost:8080/api/telegram/send-checkins -H "x-api-key: PUBLIC_OPTIN"
+          sleep 3600  # Sleep 1 hour after running
+        fi
+        sleep 300  # Check every 5 minutes
+      done
+    
+    instance_count: 1
+    instance_size_slug: basic-xxs
