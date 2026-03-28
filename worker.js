@@ -134,25 +134,16 @@ async function monitorNewActivations() {
       }
       
       // Check if they need a cycle restart (responded to a check-in)
-      if (sub.needsCycleRestart) {
+      if (sub.needsCycleRestart && !scheduledTasks.has(sub.id)) {
         console.log(`Cycle restart requested for ${sub.firstName} (${sub.id})`);
         
-        // Cancel existing scheduled tasks if any
-        const tasks = scheduledTasks.get(sub.id);
-        if (tasks) {
-          Object.values(tasks).forEach(timer => clearTimeout(timer));
-          scheduledTasks.delete(sub.id);
-          console.log(`Cancelled pending tasks for ${sub.id}`);
-        }
-        
-        // Clear the restart flag first
+        // Clear the restart flag
         sub.needsCycleRestart = false;
-        
-        // Reset check-in count so monitoring will pick it up
-        sub.totalCheckInsSent = 0;
-        
         await saveSubscribers(subscribers);
-        console.log(`Reset ${sub.firstName} - will restart in next monitoring cycle`);
+        
+        // Schedule the restart directly (no welcome message, just start the cycle)
+        console.log(`Scheduling restart cycle for ${sub.firstName}`);
+        scheduleCheckIns(sub);
       }
     }
   } catch (error) {
