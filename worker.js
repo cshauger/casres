@@ -67,7 +67,12 @@ async function sendAlert(subscriber) {
 
   // Find provider by phone number and send to their Telegram if connected
   let providerChatId = null;
-  const provider = subscribers.find(s => s.phone === sub.providerPhone);
+  
+  // Normalize phone numbers (remove all non-digits)
+  const normalizePhone = (phone) => phone ? phone.replace(/\D/g, '') : '';
+  const providerPhoneNormalized = normalizePhone(sub.providerPhone);
+  
+  const provider = subscribers.find(s => normalizePhone(s.phone) === providerPhoneNormalized);
   
   if (provider && provider.telegramChatId) {
     providerChatId = provider.telegramChatId;
@@ -75,7 +80,7 @@ async function sendAlert(subscriber) {
   } else {
     // Fallback to hardcoded for testing
     providerChatId = '8259734518';
-    console.log(`Provider not found in Telegram, sending to default (${providerChatId})`);
+    console.log(`Provider not found in Telegram (searched for ${sub.providerPhone}), sending to default (${providerChatId})`);
   }
 
   await sendTelegramMessage(providerChatId, alertMessage);
