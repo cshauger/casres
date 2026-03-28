@@ -45,6 +45,10 @@ app.post('/api/subscribers/add', async (req, res) => {
 
     const subscribers = await getSubscribers();
     
+    // Format phone numbers (just store as provided for now)
+    const formattedPhone = phone;
+    const formattedProviderPhone = providerPhone;
+    
     // Check for duplicate phone number
     const normalizePhone = (phone) => phone ? phone.replace(/\D/g, '') : '';
     const phoneNormalized = normalizePhone(formattedPhone);
