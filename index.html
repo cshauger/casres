@@ -434,6 +434,13 @@
             <p style="margin-top: 15px; font-size: 16px; opacity: 0.9;">
                 If you don't respond to any check-ins, we'll alert <strong id="caregiverName"></strong> at 4:46 PM.
             </p>
+            
+            <div id="providerInvite" style="margin-top: 30px; padding: 20px; background: #fef3c7; border-radius: 10px; border: 2px solid #f59e0b;">
+                <h3 style="margin: 0 0 15px 0; color: #92400e;">📱 Important: Activate <span id="providerNameInvite"></span>'s Alerts</h3>
+                <p style="margin-bottom: 15px;">For <strong id="providerNameInvite2"></strong> to receive alerts via Telegram, please share this link:</p>
+                <div style="background: white; padding: 15px; border-radius: 8px; font-family: monospace; word-break: break-all; margin-bottom: 15px;" id="providerLinkDisplay"></div>
+                <button onclick="copyProviderLink()" style="padding: 12px 24px; background: #0088cc; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">📋 Copy Link</button>
+            </div>
         </div>
     </div>
 
@@ -526,6 +533,13 @@
                 document.getElementById('subscriberName').textContent = formData.firstName;
                 document.getElementById('caregiverName').textContent = formData.providerName;
                 
+                // Provider invite
+                document.getElementById('providerNameInvite').textContent = formData.providerName;
+                document.getElementById('providerNameInvite2').textContent = formData.providerName;
+                const providerLink = `https://casres.com/register?ref=${data.subscriber.id}`;
+                document.getElementById('providerLinkDisplay').textContent = providerLink;
+                window.providerInviteLink = providerLink;
+                
                 // Store activation link if available
                 let activationLink = null;
                 if (data.telegram && data.telegram.activationLink) {
@@ -607,6 +621,22 @@
         
         formatPhoneNumber(document.getElementById('phone'));
         formatPhoneNumber(document.getElementById('providerPhone'));
+        
+        function copyProviderLink() {
+            if (window.providerInviteLink) {
+                navigator.clipboard.writeText(window.providerInviteLink).then(() => {
+                    alert('Link copied! Share this with your caregiver.');
+                }).catch(err => {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = window.providerInviteLink;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    alert('Link copied! Share this with your caregiver.');
+                });
+            }
+        }
     </script>
 </body>
 </html>
