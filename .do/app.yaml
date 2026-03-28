@@ -39,9 +39,9 @@ services:
       success_threshold: 1
       failure_threshold: 3
 
-# Cron workers for scheduled check-ins
+# Background worker for automated check-ins
 workers:
-  - name: morning-checkin
+  - name: checkin-scheduler
     github:
       repo: cshauger/casres
       branch: digitalocean-app-platform
@@ -50,6 +50,8 @@ workers:
     source_dir: /
     
     envs:
+      - key: NODE_ENV
+        value: production
       - key: GITHUB_TOKEN
         scope: RUN_TIME
         type: SECRET
@@ -57,16 +59,7 @@ workers:
         scope: RUN_TIME
         type: SECRET
     
-    run_command: |
-      # Run at 8am PT daily
-      while true; do
-        current_hour=$(TZ=America/Los_Angeles date +%H)
-        if [ "$current_hour" = "08" ]; then
-          curl -s -X POST http://localhost:8080/api/telegram/send-checkins -H "x-api-key: PUBLIC_OPTIN"
-          sleep 3600  # Sleep 1 hour after running
-        fi
-        sleep 300  # Check every 5 minutes
-      done
+    run_command: node worker.js
     
     instance_count: 1
     instance_size_slug: basic-xxs
