@@ -19,6 +19,8 @@
     "totalCheckInsSent": 3,
     "totalResponsesReceived": 0,
     "lastCheckInNumber": 3,
-    "dailyResponseReceived": false
+    "dailyResponseReceived": false,
+    "lastAlertSent": "2026-03-28T23:20:08.651Z",
+    "totalAlertsSent": 1
   }
 ]
