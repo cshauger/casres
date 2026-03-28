@@ -419,7 +419,11 @@
                     📱 Open Telegram & Activate
                 </a>
                 <p style="margin-top: 15px; font-size: 14px; opacity: 0.9;">
-                    Click above to activate. You'll receive test check-ins in 1, 2, and 3 minutes.
+                    <strong>On mobile:</strong> Click above to activate.<br>
+                    <strong>On desktop:</strong> Open Telegram app → Search for <strong>@CASResBot</strong> → Click "Start" → Send the message: <code id="startCode" style="background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-family: monospace;"></code>
+                </p>
+                <p style="margin-top: 10px; font-size: 13px; opacity: 0.8;">
+                    You'll receive test check-ins in 1, 2, and 3 minutes.
                 </p>
             </div>
             
@@ -518,6 +522,12 @@
                         document.getElementById('telegramOptIn').style.display = 'none';
                         document.getElementById('telegramActivation').style.display = 'block';
                         document.getElementById('telegramLink').href = activationLink;
+                        
+                        // Extract start token for desktop users
+                        const startToken = activationLink.split('start=')[1];
+                        if (startToken) {
+                            document.getElementById('startCode').textContent = '/start ' + startToken;
+                        }
                     } else {
                         alert('Activation link not available. Please contact support.');
                     }
