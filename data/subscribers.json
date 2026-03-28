@@ -60,7 +60,7 @@
     "totalResponsesReceived": 1,
     "lastAlertSent": "2026-03-28T16:16:54.406Z",
     "totalAlertsSent": 1,
-    "needsCycleRestart": true
+    "needsCycleRestart": false
   },
   {
     "id": "sub_1774718987787",
