@@ -76,9 +76,9 @@
     "status": "active",
     "source": "web_optin",
     "createdAt": "2026-03-28T17:29:47.787Z",
-    "lastCheckInSent": null,
+    "lastCheckInSent": "2026-03-28T17:31:01.914Z",
     "lastResponseReceived": null,
-    "totalCheckInsSent": 0,
+    "totalCheckInsSent": 1,
     "totalResponsesReceived": 0
   }
 ]
