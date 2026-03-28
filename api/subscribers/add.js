@@ -69,6 +69,12 @@ export default async function handler(req, res) {
 
     // Create subscriber
     const subscriberId = `sub_${Date.now()}`;
+    
+    // Generate unique link token for Telegram deep linking
+    const linkToken = telegramUsername ? 
+      Buffer.from(`${subscriberId}:${Date.now()}`).toString('base64').replace(/[=+\/]/g, '').substring(0, 16) : 
+      null;
+    
     const subscriber = {
       id: subscriberId,
       firstName,
@@ -78,6 +84,7 @@ export default async function handler(req, res) {
       providerPhone: formattedProviderPhone,
       telegramUsername: telegramUsername || null,
       telegramChatId: null, // Will be populated when user starts bot
+      telegramLinkToken: linkToken, // For auto-linking
       consentGiven: true,
       consentTimestamp: new Date().toISOString(),
       consentIp: req.headers['x-forwarded-for'] || req.socket.remoteAddress,
@@ -97,7 +104,7 @@ export default async function handler(req, res) {
     console.log(`New subscriber added: ${subscriberId} (${formattedPhone})`);
     console.log(`Total subscribers: ${subscribers.length}`);
 
-    return res.status(201).json({
+    const response = {
       success: true,
       welcomeMessageSent: false,
       note: 'Subscriber saved. Configure Twilio to enable welcome SMS.',
@@ -109,7 +116,18 @@ export default async function handler(req, res) {
         providerPhone: formattedProviderPhone,
         status: 'active'
       }
-    });
+    };
+
+    // Add Telegram activation link if username provided
+    if (telegramUsername && linkToken) {
+      response.telegram = {
+        username: telegramUsername,
+        activationLink: `https://t.me/CASResBot?start=${linkToken}`,
+        instructions: 'Click the link to activate Telegram check-ins'
+      };
+    }
+
+    return res.status(201).json(response);
 
   } catch (error) {
     console.error('Error adding subscriber:', error);

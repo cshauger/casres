@@ -41,9 +41,29 @@ export default async function handler(req, res) {
 
     console.log(`📨 @CASResBot message from ${firstName} (${chatId}): ${text}`);
 
-    // Handle /start command
-    if (textUpper === '/START') {
-      const welcomeMsg = `👋 Hi ${firstName}!\n\nI'm the *CasRes Wellness Check-In Bot*.\n\nTo register for wellness check-ins:\n1. Visit https://casres.com\n2. Complete the enrollment form\n3. Send /link to connect your account\n4. I'll send you check-ins 3x daily\n\nReply *OK* to confirm check-ins when you receive them.`;
+    // Handle /start command (with optional deep link token)
+    if (textUpper.startsWith('/START')) {
+      const token = text.split(' ')[1]; // Get token after /start
+      
+      if (token) {
+        // Deep link activation
+        const subscribers = await getSubscribers();
+        const subscriber = subscribers.find(s => s.telegramLinkToken === token);
+        
+        if (subscriber) {
+          // Auto-link account
+          subscriber.telegramChatId = chatId.toString();
+          await saveSubscribers(subscribers);
+          
+          await sendTelegramMessage(chatId,
+            `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to CasRes wellness check-ins.\n\nYou'll receive check-ins at:\n• 8:00 AM\n• 2:00 PM\n• 8:00 PM (Pacific Time)\n\nJust reply *OK* to each check-in. If you don't respond within 4 hours, we'll notify ${subscriber.providerName}.\n\n💙 You're all set!`
+          );
+          return res.status(200).json({ ok: true });
+        }
+      }
+      
+      // Regular /start (no token or invalid token)
+      const welcomeMsg = `👋 Hi ${firstName}!\n\nI'm the *CasRes Wellness Check-In Bot*.\n\nTo register for wellness check-ins:\n1. Visit https://casres.com\n2. Complete the enrollment form\n3. Click the Telegram activation link\n   _OR_ send /link to connect manually\n\nReply *OK* to confirm check-ins when you receive them.`;
       
       await sendTelegramMessage(chatId, welcomeMsg);
       return res.status(200).json({ ok: true });

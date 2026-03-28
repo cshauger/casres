@@ -498,6 +498,17 @@
                 // Success! Hide form and show success message
                 document.getElementById('subscriberName').textContent = formData.firstName;
                 document.getElementById('caregiverName').textContent = formData.providerName;
+                
+                // Add Telegram activation button if provided
+                if (data.telegram && data.telegram.activationLink) {
+                    const telegramBtn = document.createElement('a');
+                    telegramBtn.href = data.telegram.activationLink;
+                    telegramBtn.target = '_blank';
+                    telegramBtn.style.cssText = 'display:inline-block;margin-top:20px;padding:15px 30px;background:#0088cc;color:white;text-decoration:none;border-radius:8px;font-weight:bold;font-size:16px;';
+                    telegramBtn.innerHTML = '📱 Activate Telegram Check-Ins';
+                    document.getElementById('successMessage').appendChild(telegramBtn);
+                }
+                
                 formCard.style.display = 'none';
                 successMessage.classList.add('show');
                 
