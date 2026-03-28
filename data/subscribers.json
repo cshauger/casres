@@ -14,11 +14,11 @@
     "status": "active",
     "source": "web_optin",
     "createdAt": "2026-03-28T19:10:53.025Z",
-    "lastCheckInSent": "2026-03-28T20:30:30.747Z",
+    "lastCheckInSent": "2026-03-28T21:45:02.417Z",
     "lastResponseReceived": "2026-03-28T19:48:18.799Z",
-    "totalCheckInsSent": 3,
+    "totalCheckInsSent": 4,
     "totalResponsesReceived": 1,
-    "lastCheckInNumber": 3,
+    "lastCheckInNumber": 1,
     "dailyResponseReceived": false
   }
 ]
