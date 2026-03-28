@@ -122,6 +122,34 @@ function scheduleCheckIns(subscriber) {
   }, 250000); // Clean up after 4+ minutes
 }
 
+function restartCheckInCycle(subscriber) {
+  // Cancel any existing tasks
+  const existingTasks = scheduledTasks.get(subscriber.id);
+  if (existingTasks) {
+    Object.values(existingTasks).forEach(timer => clearTimeout(timer));
+    scheduledTasks.delete(subscriber.id);
+    console.log(`Cancelled pending tasks for ${subscriber.id}`);
+  }
+
+  console.log(`Restarting check-in cycle for ${subscriber.firstName} (${subscriber.id})`);
+
+  // Schedule new cycle
+  const tasks = {
+    checkin1: setTimeout(() => sendCheckIn(subscriber, 1), 60000),      // 1 min
+    checkin2: setTimeout(() => sendCheckIn(subscriber, 2), 120000),     // 2 min
+    checkin3: setTimeout(() => sendCheckIn(subscriber, 3), 180000),     // 3 min
+    alert: setTimeout(() => sendAlert(subscriber), 240000)              // 4 min
+  };
+
+  scheduledTasks.set(subscriber.id, tasks);
+
+  // Clean up after all tasks complete
+  setTimeout(() => {
+    scheduledTasks.delete(subscriber.id);
+    console.log(`Completed restart cycle for ${subscriber.id}`);
+  }, 250000);
+}
+
 async function monitorNewActivations() {
   try {
     const subscribers = await getSubscribers();
@@ -134,16 +162,15 @@ async function monitorNewActivations() {
       }
       
       // Check if they need a cycle restart (responded to a check-in)
-      if (sub.needsCycleRestart && !scheduledTasks.has(sub.id)) {
+      if (sub.needsCycleRestart) {
         console.log(`Cycle restart requested for ${sub.firstName} (${sub.id})`);
         
         // Clear the restart flag
         sub.needsCycleRestart = false;
         await saveSubscribers(subscribers);
         
-        // Schedule the restart directly (no welcome message, just start the cycle)
-        console.log(`Scheduling restart cycle for ${sub.firstName}`);
-        scheduleCheckIns(sub);
+        // Use dedicated restart subroutine
+        restartCheckInCycle(sub);
       }
     }
   } catch (error) {
