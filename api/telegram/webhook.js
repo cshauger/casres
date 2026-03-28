@@ -55,8 +55,58 @@ export default async function handler(req, res) {
           subscriber.telegramChatId = chatId.toString();
           await saveSubscribers(subscribers);
           
+          // Schedule test check-ins via OpenClaw cron (1, 2, 3, 7 minutes)
+          const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://casres.com';
+          const now = Date.now();
+          
+          try {
+            // Schedule 3 check-ins + 1 alert
+            const schedules = [
+              { delay: 60000, type: 'checkin', number: 1 },    // 1 min
+              { delay: 120000, type: 'checkin', number: 2 },   // 2 min
+              { delay: 180000, type: 'checkin', number: 3 },   // 3 min
+              { delay: 420000, type: 'alert', number: null }   // 7 min (3 + 4)
+            ];
+
+            for (const schedule of schedules) {
+              const executeAt = new Date(now + schedule.delay);
+              const url = schedule.type === 'checkin'
+                ? `${baseUrl}/api/telegram/send-test-checkin?subscriberId=${subscriber.id}&checkInNumber=${schedule.number}`
+                : `${baseUrl}/api/telegram/alert-provider?subscriberId=${subscriber.id}`;
+
+              // Create OpenClaw cron job
+              const cronPayload = {
+                action: 'add',
+                job: {
+                  name: `CasRes ${schedule.type} #${schedule.number || 'alert'} - ${subscriber.firstName}`,
+                  schedule: {
+                    kind: 'at',
+                    at: executeAt.toISOString()
+                  },
+                  payload: {
+                    kind: 'systemEvent',
+                    text: `curl -s "${url}" -H "x-api-key: PUBLIC_OPTIN"`
+                  },
+                  sessionTarget: 'main'
+                }
+              };
+
+              // Call OpenClaw cron API
+              await fetch(`${process.env.GATEWAY_URL || 'http://localhost:3000'}/cron`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(cronPayload)
+              });
+            }
+
+            console.log(`✅ Scheduled 4 tasks for ${subscriber.firstName} (${subscriber.id})`);
+          } catch (cronError) {
+            console.error('Failed to schedule cron jobs:', cronError);
+            // Continue anyway - they're still linked
+          }
+          
           await sendTelegramMessage(chatId,
-            `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to CasRes wellness check-ins.\n\nYou'll receive check-ins at:\n• 8:00 AM\n• 2:00 PM\n• 8:00 PM (Pacific Time)\n\nJust reply *OK* to each check-in. If you don't respond within 4 hours, we'll notify ${subscriber.providerName}.\n\n💙 You're all set!`
+            `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to CasRes wellness check-ins.\n\n🧪 *Test Mode:*\nYou'll receive 3 check-ins in the next 3 minutes.\nIf you don't reply "OK", we'll alert ${subscriber.providerName} after 4 more minutes.\n\nJust reply *OK* to each check-in!\n\n💙 Testing in progress...`
           );
           return res.status(200).json({ ok: true });
         }
