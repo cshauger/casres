@@ -33,6 +33,7 @@
     "lastCheckInSent": null,
     "lastResponseReceived": null,
     "totalCheckInsSent": 0,
-    "totalResponsesReceived": 0
+    "totalResponsesReceived": 0,
+    "telegramChatId": "8259734518"
   }
 ]
