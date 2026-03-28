@@ -38,27 +38,5 @@
     "totalResponsesReceived": 2,
     "lastAlertSent": "2026-03-28T02:38:13.564Z",
     "totalAlertsSent": 2
-  },
-  {
-    "id": "sub_1774713716724",
-    "firstName": "Curtis",
-    "lastName": "Shauger",
-    "phone": "(415) 806-5660",
-    "providerName": "Kim",
-    "providerPhone": "(925) 768-9020",
-    "telegramChatId": "8259734518",
-    "telegramLinkToken": "c3ViXzE3NzQ3MTM3",
-    "consentGiven": true,
-    "consentTimestamp": "2026-03-28T16:01:56.725Z",
-    "consentIp": "2601:644:8103:6880:7df0:9cb:df70:2e55,162.158.167.35",
-    "status": "active",
-    "source": "web_optin",
-    "createdAt": "2026-03-28T16:01:56.725Z",
-    "lastCheckInSent": "2026-03-28T16:05:04.512Z",
-    "lastResponseReceived": null,
-    "totalCheckInsSent": 3,
-    "totalResponsesReceived": 0,
-    "lastAlertSent": "2026-03-28T16:06:04.548Z",
-    "totalAlertsSent": 1
   }
 ]
