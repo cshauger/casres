@@ -360,32 +360,6 @@
                     >
                 </div>
 
-                <div class="form-group">
-                    <label for="providerTelegram">
-                        Caregiver Telegram (Optional)
-                        <span class="hint">(for emergency alerts via Telegram)</span>
-                    </label>
-                    <input 
-                        type="text" 
-                        id="providerTelegram" 
-                        name="providerTelegram" 
-                        placeholder="@caregivername"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="telegramUsername">
-                        Your Telegram Username (Optional)
-                        <span class="hint">(receive check-ins via Telegram - starts with @)</span>
-                    </label>
-                    <input 
-                        type="text" 
-                        id="telegramUsername" 
-                        name="telegramUsername" 
-                        placeholder="@yourusername"
-                    >
-                </div>
-
                 <!-- Consent Checkbox -->
                 <div class="checkbox-group">
                     <label class="checkbox-label">
@@ -424,16 +398,37 @@
         <div id="successMessage" class="success-message">
             <h2>✓ You're All Set!</h2>
             <p style="margin-top: 20px; font-size: 20px;"><strong id="subscriberName"></strong>, welcome to CasRes wellness check-ins!</p>
-            <p style="margin-top: 20px;">
-                📱 <strong>Check your phone</strong> — we just sent you a welcome text message.
-            </p>
-            <p style="margin-top: 15px;">
+            
+            <div id="telegramOptIn" style="margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.2); border-radius: 12px;">
+                <p style="font-size: 18px; margin-bottom: 15px;">
+                    💬 <strong>Want to receive check-ins via Telegram instead of SMS?</strong>
+                </p>
+                <p style="font-size: 14px; margin-bottom: 20px; opacity: 0.9;">
+                    Test the service with instant notifications before Twilio approval
+                </p>
+                <button id="telegramYesBtn" style="background: #0088cc; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px;">
+                    Yes, Activate Telegram
+                </button>
+                <button id="telegramNoBtn" style="background: rgba(255,255,255,0.3); color: white; border: none; padding: 12px 30px; border-radius: 8px; margin-left: 10px; cursor: pointer; font-size: 16px;">
+                    No Thanks
+                </button>
+            </div>
+            
+            <div id="telegramActivation" style="display: none; margin-top: 20px;">
+                <a id="telegramLink" href="#" target="_blank" style="display: inline-block; padding: 15px 30px; background: #0088cc; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+                    📱 Open Telegram & Activate
+                </a>
+                <p style="margin-top: 15px; font-size: 14px; opacity: 0.9;">
+                    Click above to activate. You'll receive test check-ins in 1, 2, and 3 minutes.
+                </p>
+            </div>
+            
+            <p id="smsInfo" style="margin-top: 20px;">
                 You'll receive wellness check-ins at <strong>8am, 2pm, and 8pm</strong> daily.<br>
                 Simply reply <strong>"OK"</strong> to each one.
             </p>
             <p style="margin-top: 15px; font-size: 16px; opacity: 0.9;">
-                If you don't respond within 4 hours, we'll alert <strong id="caregiverName"></strong>.<br>
-                Reply <strong>"STOP"</strong> anytime to unsubscribe.
+                If you don't respond within 4 hours, we'll alert <strong id="caregiverName"></strong>.
             </p>
         </div>
     </div>
@@ -459,8 +454,6 @@
                 phone: document.getElementById('phone').value.trim(),
                 providerName: document.getElementById('providerName').value.trim(),
                 providerPhone: document.getElementById('providerPhone').value.trim(),
-                providerTelegram: document.getElementById('providerTelegram').value.trim() || null,
-                telegramUsername: document.getElementById('telegramUsername').value.trim() || null,
                 consent: document.getElementById('consent').checked,
                 source: 'web_optin',
                 timestamp: new Date().toISOString()
@@ -513,15 +506,27 @@
                 document.getElementById('subscriberName').textContent = formData.firstName;
                 document.getElementById('caregiverName').textContent = formData.providerName;
                 
-                // Add Telegram activation button if provided
+                // Store activation link if available
+                let activationLink = null;
                 if (data.telegram && data.telegram.activationLink) {
-                    const telegramBtn = document.createElement('a');
-                    telegramBtn.href = data.telegram.activationLink;
-                    telegramBtn.target = '_blank';
-                    telegramBtn.style.cssText = 'display:inline-block;margin-top:20px;padding:15px 30px;background:#0088cc;color:white;text-decoration:none;border-radius:8px;font-weight:bold;font-size:16px;';
-                    telegramBtn.innerHTML = '📱 Activate Telegram Check-Ins';
-                    document.getElementById('successMessage').appendChild(telegramBtn);
+                    activationLink = data.telegram.activationLink;
                 }
+                
+                // Handle Telegram opt-in buttons
+                document.getElementById('telegramYesBtn').onclick = function() {
+                    if (activationLink) {
+                        document.getElementById('telegramOptIn').style.display = 'none';
+                        document.getElementById('telegramActivation').style.display = 'block';
+                        document.getElementById('telegramLink').href = activationLink;
+                    } else {
+                        alert('Activation link not available. Please contact support.');
+                    }
+                };
+                
+                document.getElementById('telegramNoBtn').onclick = function() {
+                    document.getElementById('telegramOptIn').style.display = 'none';
+                    document.getElementById('smsInfo').innerHTML = '📱 <strong>Check your phone</strong> — you\'ll receive SMS check-ins at 8am, 2pm, and 8pm daily.<br>Simply reply <strong>"OK"</strong> to each one.';
+                };
                 
                 formCard.style.display = 'none';
                 successMessage.classList.add('show');

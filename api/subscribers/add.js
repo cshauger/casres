@@ -71,10 +71,8 @@ export default async function handler(req, res) {
     // Create subscriber
     const subscriberId = `sub_${Date.now()}`;
     
-    // Generate unique link token for Telegram deep linking
-    const linkToken = telegramUsername ? 
-      Buffer.from(`${subscriberId}:${Date.now()}`).toString('base64').replace(/[=+\/]/g, '').substring(0, 16) : 
-      null;
+    // Generate unique link token for Telegram deep linking (always generate for opt-in)
+    const linkToken = Buffer.from(`${subscriberId}:${Date.now()}`).toString('base64').replace(/[=+\/]/g, '').substring(0, 16);
     
     const subscriber = {
       id: subscriberId,
@@ -83,9 +81,7 @@ export default async function handler(req, res) {
       phone: formattedPhone,
       providerName: providerName || 'Provider',
       providerPhone: formattedProviderPhone,
-      providerTelegram: providerTelegram || null,
-      telegramUsername: telegramUsername || null,
-      telegramChatId: null, // Will be populated when user starts bot
+      telegramChatId: null, // Will be populated when user activates
       telegramLinkToken: linkToken, // For auto-linking
       consentGiven: true,
       consentTimestamp: new Date().toISOString(),
@@ -120,14 +116,11 @@ export default async function handler(req, res) {
       }
     };
 
-    // Add Telegram activation link if username provided
-    if (telegramUsername && linkToken) {
-      response.telegram = {
-        username: telegramUsername,
-        activationLink: `https://t.me/CASResBot?start=${linkToken}`,
-        instructions: 'Click the link to activate Telegram check-ins'
-      };
-    }
+    // Always add Telegram activation link for opt-in choice
+    response.telegram = {
+      activationLink: `https://t.me/CASResBot?start=${linkToken}`,
+      instructions: 'Click to activate Telegram check-ins'
+    };
 
     return res.status(201).json(response);
 
