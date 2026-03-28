@@ -57,6 +57,8 @@
     "lastCheckInSent": "2026-03-28T16:05:04.512Z",
     "lastResponseReceived": null,
     "totalCheckInsSent": 3,
-    "totalResponsesReceived": 0
+    "totalResponsesReceived": 0,
+    "lastAlertSent": "2026-03-28T16:06:04.548Z",
+    "totalAlertsSent": 1
   }
 ]
