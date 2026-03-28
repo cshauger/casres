@@ -55,11 +55,12 @@
     "source": "web_optin",
     "createdAt": "2026-03-28T16:12:42.925Z",
     "lastCheckInSent": "2026-03-28T16:15:54.362Z",
-    "lastResponseReceived": null,
+    "lastResponseReceived": "2026-03-28T17:33:17.630Z",
     "totalCheckInsSent": 3,
-    "totalResponsesReceived": 0,
+    "totalResponsesReceived": 1,
     "lastAlertSent": "2026-03-28T16:16:54.406Z",
-    "totalAlertsSent": 1
+    "totalAlertsSent": 1,
+    "needsCycleRestart": true
   },
   {
     "id": "sub_1774718987787",
