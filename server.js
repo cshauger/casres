@@ -133,7 +133,7 @@ app.post('/api/telegram/webhook', async (req, res) => {
         await saveSubscribers(subscribers);
         
         await sendTelegramMessage(chatId,
-          `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to CasRes wellness check-ins.\n\n🧪 *Test Mode:*\nYou'll receive 3 check-ins in the next 3 minutes.\nIf you don't reply "OK", we'll alert ${subscriber.providerName} 1 minute later (4 min total).\n\nJust reply *OK* to any check-in!\n\n💙 Testing in progress...`
+          `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to CasRes wellness check-ins.\n\n📅 *Daily Check-In Schedule (Pacific Time):*\n• 12:30 PM\n• 1:00 PM\n• 1:30 PM\n\nJust reply with any message to confirm you're doing well.\n\nIf you don't respond to any check-ins, we'll alert ${subscriber.providerName} at 2:00 PM.\n\n💙 You're all set!`
         );
         return res.status(200).json({ ok: true });
       }
