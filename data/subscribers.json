@@ -38,5 +38,25 @@
     "totalResponsesReceived": 2,
     "lastAlertSent": "2026-03-28T02:38:13.564Z",
     "totalAlertsSent": 2
+  },
+  {
+    "id": "sub_1774710735930",
+    "firstName": "Curtis",
+    "lastName": "Shauger",
+    "phone": "(415) 806-5660",
+    "providerName": "Kim Jespersen",
+    "providerPhone": "(925) 768-9020",
+    "telegramChatId": null,
+    "telegramLinkToken": "c3ViXzE3NzQ3MTA3",
+    "consentGiven": true,
+    "consentTimestamp": "2026-03-28T15:12:15.930Z",
+    "consentIp": "2601:644:8103:6880:917f:deee:b221:f6f9,104.22.17.217",
+    "status": "active",
+    "source": "web_optin",
+    "createdAt": "2026-03-28T15:12:15.930Z",
+    "lastCheckInSent": null,
+    "lastResponseReceived": null,
+    "totalCheckInsSent": 0,
+    "totalResponsesReceived": 0
   }
 ]
