@@ -147,7 +147,7 @@ app.post('/api/telegram/webhook', async (req, res) => {
         await saveSubscribers(subscribers);
 
         await sendTelegramMessage(chatId,
-          `✅ Thank you ${subscriber.firstName}! Wellness check-in confirmed. 💙\n\n_Next cycle starts in 1 minute..._`
+          `✅ Thank you ${subscriber.firstName}! Wellness check-in confirmed. 💙\n\n*⚠️ IF THIS IS A REAL EMERGENCY, CALL 911 IMMEDIATELY*\n\n_Next cycle starts in 1 minute..._`
         );
       }
       return res.status(200).json({ ok: true });
