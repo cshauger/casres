@@ -65,7 +65,7 @@ export default async function handler(req, res) {
               { delay: 60000, type: 'checkin', number: 1 },    // 1 min
               { delay: 120000, type: 'checkin', number: 2 },   // 2 min
               { delay: 180000, type: 'checkin', number: 3 },   // 3 min
-              { delay: 420000, type: 'alert', number: null }   // 7 min (3 + 4)
+              { delay: 240000, type: 'alert', number: null }   // 4 min (1 min after 3rd)
             ];
 
             for (const schedule of schedules) {
@@ -106,7 +106,7 @@ export default async function handler(req, res) {
           }
           
           await sendTelegramMessage(chatId,
-            `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to CasRes wellness check-ins.\n\n🧪 *Test Mode:*\nYou'll receive 3 check-ins in the next 3 minutes.\nIf you don't reply "OK", we'll alert ${subscriber.providerName} after 4 more minutes.\n\nJust reply *OK* to each check-in!\n\n💙 Testing in progress...`
+            `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to CasRes wellness check-ins.\n\n🧪 *Test Mode:*\nYou'll receive 3 check-ins in the next 3 minutes.\nIf you don't reply "OK", we'll alert ${subscriber.providerName} 1 minute later (4 min total).\n\nJust reply *OK* to any check-in!\n\n💙 Testing in progress...`
           );
           return res.status(200).json({ ok: true });
         }
