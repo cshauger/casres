@@ -35,27 +35,5 @@
     "totalCheckInsSent": 0,
     "totalResponsesReceived": 0,
     "telegramChatId": "8259734518"
-  },
-  {
-    "id": "sub_1774663106566",
-    "firstName": "Kim",
-    "lastName": "Jespersen",
-    "phone": "+19257689020",
-    "providerName": "Curtis Shauger",
-    "providerPhone": "+14156085660",
-    "telegramChatId": "8439984421",
-    "telegramLinkToken": "c3ViXzE3NzQ2NjMx",
-    "consentGiven": true,
-    "consentTimestamp": "2026-03-28T01:58:26.566Z",
-    "consentIp": "73.162.146.71",
-    "status": "active",
-    "source": "web_optin",
-    "createdAt": "2026-03-28T01:58:26.566Z",
-    "lastCheckInSent": "2026-03-28T02:04:46.693Z",
-    "lastResponseReceived": null,
-    "totalCheckInsSent": 3,
-    "totalResponsesReceived": 0,
-    "lastAlertSent": "2026-03-28T02:05:51.270Z",
-    "totalAlertsSent": 1
   }
 ]
