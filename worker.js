@@ -145,20 +145,14 @@ async function monitorNewActivations() {
           console.log(`Cancelled pending tasks for ${sub.id}`);
         }
         
-        // Clear the restart flag
+        // Clear the restart flag first
         sub.needsCycleRestart = false;
-        await saveSubscribers(subscribers);
         
-        // Schedule restart in 1 minute (only if not already scheduled)
-        if (!scheduledTasks.has(sub.id)) {
-          setTimeout(() => {
-            console.log(`Restarting cycle for ${sub.firstName} (${sub.id})`);
-            scheduleCheckIns(sub);
-          }, 60000);
-          
-          // Mark as scheduled immediately to prevent duplicates
-          scheduledTasks.set(sub.id, { pending: true });
-        }
+        // Reset check-in count so monitoring will pick it up
+        sub.totalCheckInsSent = 0;
+        
+        await saveSubscribers(subscribers);
+        console.log(`Reset ${sub.firstName} - will restart in next monitoring cycle`);
       }
     }
   } catch (error) {
