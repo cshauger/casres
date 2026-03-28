@@ -25,6 +25,7 @@ export default async function handler(req, res) {
       phone,
       providerName,
       providerPhone,
+      telegramUsername,
       consent
     } = req.body;
 
@@ -75,6 +76,8 @@ export default async function handler(req, res) {
       phone: formattedPhone,
       providerName: providerName || 'Provider',
       providerPhone: formattedProviderPhone,
+      telegramUsername: telegramUsername || null,
+      telegramChatId: null, // Will be populated when user starts bot
       consentGiven: true,
       consentTimestamp: new Date().toISOString(),
       consentIp: req.headers['x-forwarded-for'] || req.socket.remoteAddress,

@@ -193,6 +193,7 @@
                 <tr>
                     <th>Name</th>
                     <th>Phone</th>
+                    <th>Telegram</th>
                     <th>Caregiver</th>
                     <th>Caregiver Phone</th>
                     <th>Status</th>
@@ -257,9 +258,14 @@
 
             subscribers.forEach(sub => {
                 const row = document.createElement('tr');
+                const telegramStatus = sub.telegramUsername 
+                    ? `${sub.telegramUsername} ${sub.telegramChatId ? '✅' : '⏳'}`
+                    : '—';
+                
                 row.innerHTML = `
                     <td><strong>${sub.firstName} ${sub.lastName}</strong></td>
                     <td class="phone">${sub.phone}</td>
+                    <td>${telegramStatus}</td>
                     <td>${sub.providerName || 'N/A'}</td>
                     <td class="phone">${sub.providerPhone || 'N/A'}</td>
                     <td><span class="status ${sub.status}">${sub.status}</span></td>

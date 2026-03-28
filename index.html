@@ -360,6 +360,19 @@
                     >
                 </div>
 
+                <div class="form-group">
+                    <label for="telegramUsername">
+                        Telegram Username (Optional)
+                        <span class="hint">(receive check-ins via Telegram - starts with @)</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="telegramUsername" 
+                        name="telegramUsername" 
+                        placeholder="@yourusername"
+                    >
+                </div>
+
                 <!-- Consent Checkbox -->
                 <div class="checkbox-group">
                     <label class="checkbox-label">
@@ -433,6 +446,7 @@
                 phone: document.getElementById('phone').value.trim(),
                 providerName: document.getElementById('providerName').value.trim(),
                 providerPhone: document.getElementById('providerPhone').value.trim(),
+                telegramUsername: document.getElementById('telegramUsername').value.trim() || null,
                 consent: document.getElementById('consent').checked,
                 source: 'web_optin',
                 timestamp: new Date().toISOString()

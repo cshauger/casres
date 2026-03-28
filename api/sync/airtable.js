@@ -65,7 +65,7 @@ export default async function handler(req, res) {
           'Last Name': sub.lastName,
           'Mobile': sub.phone,
           'Submitted': sub.createdAt,
-          'Notes': `Provider: ${sub.providerName} (${sub.providerPhone})\nStatus: ${sub.status}\nConsent: ${sub.consentTimestamp}\nCheck-ins sent: ${sub.totalCheckInsSent || 0}\nResponses: ${sub.totalResponsesReceived || 0}`
+          'Notes': `Provider: ${sub.providerName} (${sub.providerPhone})\nStatus: ${sub.status}\nTelegram: ${sub.telegramUsername || 'Not provided'} ${sub.telegramChatId ? '(Connected)' : '(Not started)'}\nConsent: ${sub.consentTimestamp}\nCheck-ins sent: ${sub.totalCheckInsSent || 0}\nResponses: ${sub.totalResponsesReceived || 0}`
         };
 
         const existingRecordId = existingMap.get(sub.phone);
