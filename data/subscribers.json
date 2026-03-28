@@ -18,6 +18,6 @@
     "lastResponseReceived": "2026-03-28T18:19:35.148Z",
     "totalCheckInsSent": 1,
     "totalResponsesReceived": 1,
-    "needsCycleRestart": true
+    "needsCycleRestart": false
   }
 ]
