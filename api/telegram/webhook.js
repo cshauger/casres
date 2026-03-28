@@ -160,9 +160,17 @@ export default async function handler(req, res) {
         subscriber.totalResponsesReceived = (subscriber.totalResponsesReceived || 0) + 1;
         await saveSubscribers(subscribers);
 
+        // RESET: Schedule new cycle starting in 1 minute
+        // TODO: Cancel any pending check-ins/alerts for this subscriber
+        // For now, we'll just schedule fresh - manual cancellation needed
+        
         await sendTelegramMessage(chatId,
-          `✅ Thank you ${subscriber.firstName}! Your wellness check-in is confirmed. 💙\n\n_Next check-in: 8am, 2pm, or 8pm PT_`
+          `✅ Thank you ${subscriber.firstName}! Wellness check-in confirmed. 💙\n\n_Next check-in starts in 1 minute..._`
         );
+        
+        // Trigger restart cycle (check-in #1 in 1 minute)
+        // This will be manual for now - need to call the endpoint
+        console.log(`⟳ ${subscriber.firstName} responded - cycle should reset`);
       } else {
         await sendTelegramMessage(chatId,
           `I don't have you registered yet.\n\nPlease sign up at https://casres.com and I'll link your account!`

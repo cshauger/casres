@@ -44,6 +44,20 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Subscriber has not activated Telegram' });
     }
 
+    // Check if they already responded since the last check-in
+    const lastCheckIn = subscriber.lastCheckInSent ? new Date(subscriber.lastCheckInSent) : null;
+    const lastResponse = subscriber.lastResponseReceived ? new Date(subscriber.lastResponseReceived) : null;
+
+    if (lastResponse && lastCheckIn && lastResponse > lastCheckIn) {
+      // They already responded! Skip this check-in
+      return res.status(200).json({
+        success: true,
+        skipped: true,
+        reason: 'Subscriber already responded',
+        lastResponse: subscriber.lastResponseReceived
+      });
+    }
+
     const number = checkInNumber || '1';
     const message = `🌟 *Test Check-In #${number}*\n\nHi ${subscriber.firstName}!\n\nThis is test check-in #${number} (sent ${Math.round(parseInt(number))} minute${number === '1' ? '' : 's'} after registration).\n\nPlease reply *OK* to confirm you're doing well.\n\n_In production, these would be sent at 8am, 2pm, and 8pm._\n\n💙 Reply OK to confirm`;
 
