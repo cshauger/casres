@@ -25,6 +25,7 @@ export default async function handler(req, res) {
       phone,
       providerName,
       providerPhone,
+      providerTelegram,
       telegramUsername,
       consent
     } = req.body;
@@ -82,6 +83,7 @@ export default async function handler(req, res) {
       phone: formattedPhone,
       providerName: providerName || 'Provider',
       providerPhone: formattedProviderPhone,
+      providerTelegram: providerTelegram || null,
       telegramUsername: telegramUsername || null,
       telegramChatId: null, // Will be populated when user starts bot
       telegramLinkToken: linkToken, // For auto-linking

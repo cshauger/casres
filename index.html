@@ -361,8 +361,21 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="providerTelegram">
+                        Caregiver Telegram (Optional)
+                        <span class="hint">(for emergency alerts via Telegram)</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="providerTelegram" 
+                        name="providerTelegram" 
+                        placeholder="@caregivername"
+                    >
+                </div>
+
+                <div class="form-group">
                     <label for="telegramUsername">
-                        Telegram Username (Optional)
+                        Your Telegram Username (Optional)
                         <span class="hint">(receive check-ins via Telegram - starts with @)</span>
                     </label>
                     <input 
@@ -446,6 +459,7 @@
                 phone: document.getElementById('phone').value.trim(),
                 providerName: document.getElementById('providerName').value.trim(),
                 providerPhone: document.getElementById('providerPhone').value.trim(),
+                providerTelegram: document.getElementById('providerTelegram').value.trim() || null,
                 telegramUsername: document.getElementById('telegramUsername').value.trim() || null,
                 consent: document.getElementById('consent').checked,
                 source: 'web_optin',
