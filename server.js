@@ -259,9 +259,9 @@ app.post('/api/telegram/webhook', async (req, res) => {
         
         const providerTelegramLink = `https://t.me/CASResBot?start=${providerLinkToken}`;
         
-        // Send provider activation link
+        // Send copyable message for provider
         await sendTelegramMessage(chatId,
-          `🔔 *${subscriber.providerName} needs to activate Telegram alerts!*\n\nShare this link with ${subscriber.providerName}:\n\n${providerTelegramLink}\n\n📋 *To copy:* Long-press the link → tap "Copy link"\n\nWhen ${subscriber.providerName} clicks it, they'll be connected instantly!`
+          `📋 *Copy and paste this entire message to ${subscriber.providerName}:*\n\n━━━━━━━━━━━━━━━\n\nHi ${subscriber.providerName},\n\nI signed up for CasRes wellness check-ins. If you agree to be my emergency contact and receive alerts if I don't respond to check-ins, please click this link to register:\n\n${providerTelegramLink}\n\nThanks!\n- ${subscriber.firstName}`
         );
         return res.status(200).json({ ok: true });
       }
