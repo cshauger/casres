@@ -226,7 +226,7 @@ app.post('/api/telegram/webhook', async (req, res) => {
         const providerLink = `https://casres.com/register?ref=${subscriber.id}`;
         
         await sendTelegramMessage(chatId,
-          `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to CasRes wellness check-ins.\n\n📅 *Daily Check-In Schedule (Pacific Time):*\n• 6:00 PM\n• 6:02 PM\n• 6:04 PM\n\nJust reply with any message to confirm you're doing well.\n\nIf you don't respond to any check-ins, we'll alert ${subscriber.providerName} at 6:06 PM.\n\n💙 You're all set!`
+          `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to CasRes wellness check-ins.\n\n📅 *Daily Check-In Schedule (Pacific Time):*\n• 6:00 PM\n• 6:02 PM\n• 6:04 PM\n\nJust reply with any message to confirm you're doing well.\n\nIf you don't respond to any check-ins, we'll alert ${subscriber.providerName} at 6:06 PM.\n\n💙 You're all set!\n\n━━━━━━━━━━━━━━━\n\n*Copy and paste the following message to ${subscriber.providerName}:*`
         );
         
         // Create provider record and Telegram link immediately
@@ -261,7 +261,7 @@ app.post('/api/telegram/webhook', async (req, res) => {
         
         // Send copyable message for provider
         await sendTelegramMessage(chatId,
-          `*Copy and paste the following message to ${subscriber.providerName}:*\n\n━━━━━━━━━━━━━━━\n\n📋 Hi ${subscriber.providerName},\n\nI signed up for CasRes wellness check-ins. If you agree to be my emergency contact and receive alerts if I don't respond to check-ins, please click this link:\n\n${providerTelegramLink}\n\nWhen Telegram opens, tap the START button to complete registration. That's it!\n\nThanks!\n- ${subscriber.firstName}`
+          `📋 Hi ${subscriber.providerName},\n\nI signed up for CasRes wellness check-ins. If you agree to be my emergency contact and receive alerts if I don't respond to check-ins, please click this link:\n\n${providerTelegramLink}\n\nWhen Telegram opens, tap the START button to complete registration. That's it!\n\nThanks!\n- ${subscriber.firstName}`
         );
         return res.status(200).json({ ok: true });
       }
