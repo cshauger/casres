@@ -149,7 +149,7 @@ async function runScheduledCheckIns() {
         const refreshedSubs = await getSubscribers();
         
         for (const sub of refreshedSubs) {
-          if (sub.status === 'active' && sub.telegramChatId && !sub.dailyResponseReceived) {
+          if (sub.status === 'active' && sub.telegramChatId && !sub.dailyResponseReceived && sub.source !== 'auto_provider_creation') {
             console.log(`No response from ${sub.firstName} - sending alert`);
             await sendAlertToProvider(sub);
           }
