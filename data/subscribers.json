@@ -35,11 +35,11 @@
     "status": "active",
     "source": "auto_provider_creation",
     "createdAt": "2026-03-29T04:03:08.794Z",
-    "lastCheckInSent": "2026-03-29T16:02:29.998Z",
+    "lastCheckInSent": "2026-03-29T16:04:30.052Z",
     "lastResponseReceived": null,
-    "totalCheckInsSent": 2,
+    "totalCheckInsSent": 3,
     "totalResponsesReceived": 0,
-    "lastCheckInNumber": 2,
+    "lastCheckInNumber": 3,
     "dailyResponseReceived": false
   }
 ]
