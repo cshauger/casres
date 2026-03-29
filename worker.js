@@ -10,9 +10,9 @@ const CHECK_INTERVAL = 30000; // Check every 30 seconds
 
 // Check-in times (Pacific Time)
 const CHECK_IN_TIMES = [
-  { hour: 20, minute: 5, number: 1 },
-  { hour: 20, minute: 7, number: 2 },
-  { hour: 20, minute: 9, number: 3 }
+  { hour: 20, minute: 45, number: 1 },
+  { hour: 20, minute: 47, number: 2 },
+  { hour: 20, minute: 49, number: 3 }
 ];
 
 const lastSentTimes = new Map(); // Track when we last sent each check-in
@@ -136,9 +136,9 @@ async function runScheduledCheckIns() {
       }
     }
     
-    // After 8:11 PM PT, check for missed check-ins and send alerts
+    // After 8:51 PM PT, check for missed check-ins and send alerts
     const now = getCurrentPacificTime();
-    if (now.getHours() === 20 && now.getMinutes() === 11) {
+    if (now.getHours() === 20 && now.getMinutes() === 51) {
       const today = now.toDateString();
       const alertKey = `alert-${today}`;
       
