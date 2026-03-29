@@ -225,9 +225,9 @@ app.post('/api/telegram/webhook', async (req, res) => {
           `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to CasRes wellness check-ins.\n\n📅 *Daily Check-In Schedule (Pacific Time):*\n• 5:30 PM\n• 5:32 PM\n• 5:34 PM\n\nJust reply with any message to confirm you're doing well.\n\nIf you don't respond to any check-ins, we'll alert ${subscriber.providerName} at 5:36 PM.\n\n💙 You're all set!`
         );
         
-        // Send a separate forwardable message for the provider
+        // Send provider registration instructions
         await sendTelegramMessage(chatId,
-          `🔔 *ACTION REQUIRED: Send this to ${subscriber.providerName}*\n\n👇 Long-press this message → tap "Forward" → select ${subscriber.providerName}\n\n━━━━━━━━━━━━━━━\n\nHi ${subscriber.providerName}! 👋\n\n${subscriber.firstName} has signed up for CasRes wellness check-ins and listed you as their caregiver.\n\nTo receive alerts if ${subscriber.firstName} doesn't respond to check-ins, please register here:\n\n${providerLink}\n\nIt only takes 30 seconds to activate Telegram alerts!\n\n━━━━━━━━━━━━━━━`
+          `🔔 *IMPORTANT: ${subscriber.providerName} needs to register too!*\n\nSend them this link (copy and paste it via text/Telegram/email):\n\n${providerLink}\n\n📋 Tap to copy the link above, then send it to ${subscriber.providerName}.\n\nThey'll click it, enter their phone number, and activate Telegram alerts. Takes 30 seconds!\n\n💡 You can also find this link on your CasRes confirmation page.`
         );
         return res.status(200).json({ ok: true });
       }
