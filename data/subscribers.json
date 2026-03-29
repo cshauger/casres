@@ -15,8 +15,9 @@
     "source": "web_optin",
     "createdAt": "2026-03-29T00:56:53.119Z",
     "lastCheckInSent": null,
-    "lastResponseReceived": null,
+    "lastResponseReceived": "2026-03-29T00:57:33.787Z",
     "totalCheckInsSent": 0,
-    "totalResponsesReceived": 0
+    "totalResponsesReceived": 1,
+    "dailyResponseReceived": true
   }
 ]
