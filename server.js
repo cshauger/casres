@@ -227,7 +227,7 @@ app.post('/api/telegram/webhook', async (req, res) => {
         
         // Send a separate forwardable message for the provider
         await sendTelegramMessage(chatId,
-          `📨 *Please forward this message to ${subscriber.providerName}:*\n\n━━━━━━━━━━━━━━━\n\nHi ${subscriber.providerName}! 👋\n\n${subscriber.firstName} has signed up for CasRes wellness check-ins and listed you as their caregiver.\n\nTo receive alerts if ${subscriber.firstName} doesn't respond to check-ins, please register here:\n\n${providerLink}\n\nIt only takes 30 seconds to activate Telegram alerts!\n\n━━━━━━━━━━━━━━━`
+          `🔔 *ACTION REQUIRED: Send this to ${subscriber.providerName}*\n\n👇 Long-press this message → tap "Forward" → select ${subscriber.providerName}\n\n━━━━━━━━━━━━━━━\n\nHi ${subscriber.providerName}! 👋\n\n${subscriber.firstName} has signed up for CasRes wellness check-ins and listed you as their caregiver.\n\nTo receive alerts if ${subscriber.firstName} doesn't respond to check-ins, please register here:\n\n${providerLink}\n\nIt only takes 30 seconds to activate Telegram alerts!\n\n━━━━━━━━━━━━━━━`
         );
         return res.status(200).json({ ok: true });
       }
