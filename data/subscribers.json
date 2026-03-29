@@ -22,5 +22,24 @@
     "lastCheckInNumber": 3,
     "lastAlertSent": "2026-03-29T01:06:09.548Z",
     "totalAlertsSent": 1
+  },
+  {
+    "id": "sub_1774750648190_provider",
+    "firstName": "Kim",
+    "lastName": "Jespersen",
+    "phone": "+19257689020",
+    "providerName": "Curtis Shauger",
+    "providerPhone": "+14158065660",
+    "telegramChatId": null,
+    "telegramLinkToken": "c3ViXzE3NzQ3NTA2",
+    "consentGiven": true,
+    "consentTimestamp": "2026-03-29T02:17:28.190Z",
+    "status": "active",
+    "source": "manual_provider_creation",
+    "createdAt": "2026-03-29T02:17:28.190Z",
+    "lastCheckInSent": null,
+    "lastResponseReceived": null,
+    "totalCheckInsSent": 0,
+    "totalResponsesReceived": 0
   }
 ]
