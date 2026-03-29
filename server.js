@@ -73,7 +73,7 @@ app.post('/api/subscribers/add', async (req, res) => {
     }
     
     const subscriberId = `sub_${Date.now()}`;
-    const linkToken = Buffer.from(`${subscriberId}:${Date.now()}`).toString('base64').replace(/[=+\/]/g, '').substring(0, 16);
+    const linkToken = Buffer.from(`${subscriberId}:${Math.random()}`).toString('base64').replace(/[=+\/]/g, '').substring(0, 16);
 
     const subscriber = {
       id: subscriberId,
