@@ -238,7 +238,7 @@ app.post('/api/telegram/webhook', async (req, res) => {
         const providerLink = `https://casres.com/register?ref=${subscriber.id}`;
         
         await sendTelegramMessage(chatId,
-          `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to CasRes wellness check-ins.\n\n📅 *Daily Check-In Schedule (Pacific Time):*\n• 7:40 PM\n• 7:42 PM\n• 7:44 PM\n\nJust reply with any message to confirm you're doing well.\n\nIf you don't respond to any check-ins, we'll alert ${subscriber.providerName} at 7:46 PM.\n\n💙 You're all set!\n\n━━━━━━━━━━━━━━━\n\n*Copy and paste the following message to ${subscriber.providerName}:*`
+          `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to CasRes wellness check-ins.\n\n📅 *Daily Check-In Schedule (Pacific Time):*\n• 7:50 PM\n• 7:52 PM\n• 7:54 PM\n\nJust reply with any message to confirm you're doing well.\n\nIf you don't respond to any check-ins, we'll alert ${subscriber.providerName} at 7:56 PM.\n\n💙 You're all set!\n\n━━━━━━━━━━━━━━━\n\n*Copy and paste the following message to ${subscriber.providerName}:*`
         );
         
         // Check if provider already exists for this subscriber
@@ -305,7 +305,7 @@ app.post('/api/telegram/webhook', async (req, res) => {
         await saveSubscribers(subscribers);
 
         await sendTelegramMessage(chatId,
-          `✅ Thank you ${subscriber.firstName}! Wellness check-in confirmed. 💙\n\n*⚠️ IF THIS IS A REAL EMERGENCY, CALL 911 IMMEDIATELY*\n\n_Next check-in: 7:40 PM, 7:42 PM, or 7:44 PM Pacific_`
+          `✅ Thank you ${subscriber.firstName}! Wellness check-in confirmed. 💙\n\n*⚠️ IF THIS IS A REAL EMERGENCY, CALL 911 IMMEDIATELY*\n\n_Next check-in: 7:50 PM, 7:52 PM, or 7:54 PM Pacific_`
         );
       }
       return res.status(200).json({ ok: true });
