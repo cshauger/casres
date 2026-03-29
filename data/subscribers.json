@@ -14,10 +14,12 @@
     "status": "active",
     "source": "web_optin",
     "createdAt": "2026-03-29T02:47:25.543Z",
-    "lastCheckInSent": null,
+    "lastCheckInSent": "2026-03-29T02:50:04.819Z",
     "lastResponseReceived": null,
-    "totalCheckInsSent": 0,
-    "totalResponsesReceived": 0
+    "totalCheckInsSent": 1,
+    "totalResponsesReceived": 0,
+    "lastCheckInNumber": 1,
+    "dailyResponseReceived": false
   },
   {
     "id": "sub_1774752451559_provider",
