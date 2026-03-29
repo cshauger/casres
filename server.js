@@ -140,8 +140,10 @@ app.post('/api/telegram/webhook', async (req, res) => {
         subscriber.telegramChatId = chatId.toString();
         await saveSubscribers(subscribers);
         
+        const providerLink = `https://casres.com/register?ref=${subscriber.id}`;
+        
         await sendTelegramMessage(chatId,
-          `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to CasRes wellness check-ins.\n\n📅 *Daily Check-In Schedule (Pacific Time):*\n• 4:40 PM\n• 4:42 PM\n• 4:44 PM\n\nJust reply with any message to confirm you're doing well.\n\nIf you don't respond to any check-ins, we'll alert ${subscriber.providerName} at 4:46 PM.\n\n💙 You're all set!`
+          `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to CasRes wellness check-ins.\n\n📅 *Daily Check-In Schedule (Pacific Time):*\n• 4:40 PM\n• 4:42 PM\n• 4:44 PM\n\nJust reply with any message to confirm you're doing well.\n\nIf you don't respond to any check-ins, we'll alert ${subscriber.providerName} at 4:46 PM.\n\n*🔔 Important: ${subscriber.providerName} needs to register too!*\nShare this link with them: ${providerLink}\n\n💙 You're all set!`
         );
         return res.status(200).json({ ok: true });
       }
