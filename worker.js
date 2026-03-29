@@ -127,9 +127,9 @@ async function runScheduledCheckIns() {
       if (shouldSendCheckIn(checkInTime)) {
         console.log(`Triggering check-in #${checkInTime.number} at ${checkInTime.hour}:${String(checkInTime.minute).padStart(2, '0')} PT`);
         
-        // Send to all active subscribers with Telegram connected
+        // Send to all active subscribers (NOT providers) with Telegram connected
         for (const sub of subscribers) {
-          if (sub.status === 'active' && sub.telegramChatId) {
+          if (sub.status === 'active' && sub.telegramChatId && sub.source !== 'auto_provider_creation') {
             await sendCheckInToSubscriber(sub, checkInTime.number);
           }
         }
