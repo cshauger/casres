@@ -21,15 +21,18 @@ app.use(express.static(__dirname));
 const TELEGRAM_TOKEN = process.env.CASRES_BOT_TOKEN;
 
 // Helper: Send Telegram message
-async function sendTelegramMessage(chatId, text) {
+async function sendTelegramMessage(chatId, text, options = {}) {
+  const payload = {
+    chat_id: chatId,
+    text: text,
+    parse_mode: 'Markdown',
+    ...options
+  };
+  
   const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text: text,
-      parse_mode: 'Markdown'
-    })
+    body: JSON.stringify(payload)
   });
   return response.json();
 }
@@ -225,9 +228,19 @@ app.post('/api/telegram/webhook', async (req, res) => {
           `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to CasRes wellness check-ins.\n\n📅 *Daily Check-In Schedule (Pacific Time):*\n• 5:30 PM\n• 5:32 PM\n• 5:34 PM\n\nJust reply with any message to confirm you're doing well.\n\nIf you don't respond to any check-ins, we'll alert ${subscriber.providerName} at 5:36 PM.\n\n💙 You're all set!`
         );
         
-        // Send provider registration instructions
+        // Send provider registration instructions with inline buttons
         await sendTelegramMessage(chatId,
-          `🔔 *IMPORTANT: ${subscriber.providerName} needs to register too!*\n\nSend them this link (copy and paste it via text/Telegram/email):\n\n${providerLink}\n\n📋 Tap to copy the link above, then send it to ${subscriber.providerName}.\n\nThey'll click it, enter their phone number, and activate Telegram alerts. Takes 30 seconds!\n\n💡 You can also find this link on your CasRes confirmation page.`
+          `🔔 *IMPORTANT: ${subscriber.providerName} needs to register too!*\n\nShare the registration link below with ${subscriber.providerName} so they can receive alerts if you don't respond to check-ins.\n\nTakes 30 seconds to activate!`,
+          {
+            reply_markup: {
+              inline_keyboard: [
+                [
+                  { text: '📋 Copy Link', url: providerLink },
+                  { text: '📱 Open Link', url: providerLink }
+                ]
+              ]
+            }
+          }
         );
         return res.status(200).json({ ok: true });
       }
