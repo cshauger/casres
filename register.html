@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provider Registration - CasRes</title>
+    <meta name="description" content="Register as a wellness check-in provider.">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        input[type="text"],
+        input[type="tel"] {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="tel"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-card {
+            display: none;
+        }
+
+        .success-card.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="formCard">
+            <h1>🔔 Provider Registration</h1>
+            <p class="subtitle">Register to receive wellness check-in alerts</p>
+
+            <div class="info-box" id="subscriberInfo">
+                <strong id="subscriberName"></strong> has listed you as their emergency contact for CasRes wellness check-ins.
+            </div>
+
+            <div id="errorMessage" class="error-message">
+                <strong>⚠️ Error:</strong>
+                <p id="errorText"></p>
+            </div>
+
+            <form id="providerForm">
+                <div class="form-group">
+                    <label for="phone">Your Mobile Phone Number *</label>
+                    <input 
+                        type="tel" 
+                        id="phone" 
+                        name="phone" 
+                        required
+                        placeholder="(555) 123-4567"
+                    >
+                </div>
+
+                <button type="submit" id="submitBtn">Register & Activate Telegram</button>
+            </form>
+        </div>
+
+        <div id="successCard" class="success-card">
+            <h1>✅ Registration Complete!</h1>
+            <p style="margin: 20px 0;">You're now registered to receive alerts for <strong id="subscriberName2"></strong>.</p>
+            
+            <div class="info-box">
+                <strong>Next Step: Activate Telegram</strong>
+                <p style="margin-top: 10px;">Click the button below to connect your Telegram account:</p>
+                <div style="margin-top: 15px;">
+                    <a id="telegramLink" href="#" target="_blank" style="display: inline-block; padding: 15px 30px; background: #0088cc; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
+                        📱 Open Telegram & Activate
+                    </a>
+                </div>
+                <p style="margin-top: 15px; font-size: 14px; opacity: 0.8;">
+                    <strong>On desktop:</strong> Open Telegram app → Search for <strong>@CASResBot</strong> → Send: <code id="startCode" style="background: #f3f4f6; padding: 2px 6px; border-radius: 4px;"></code>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const refId = urlParams.get('ref');
+
+        if (!refId) {
+            document.getElementById('errorText').textContent = 'Invalid registration link. Please use the link provided by your family member.';
+            document.getElementById('errorMessage').classList.add('show');
+            document.getElementById('submitBtn').disabled = true;
+        }
+
+        // Fetch subscriber info
+        if (refId) {
+            fetch(`/api/subscribers/list`, {
+                headers: { 'x-api-key': 'PUBLIC_OPTIN' }
+            })
+            .then(r => r.json())
+            .then(data => {
+                const subscriber = data.subscribers.find(s => s.id === refId);
+                if (subscriber) {
+                    document.getElementById('subscriberName').textContent = `${subscriber.firstName} ${subscriber.lastName}`;
+                    document.getElementById('subscriberName2').textContent = `${subscriber.firstName} ${subscriber.lastName}`;
+                    document.getElementById('subscriberInfo').style.display = 'block';
+                } else {
+                    document.getElementById('errorText').textContent = 'Subscriber not found. The registration link may be invalid.';
+                    document.getElementById('errorMessage').classList.add('show');
+                    document.getElementById('submitBtn').disabled = true;
+                }
+            });
+        }
+
+        document.getElementById('providerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const phone = document.getElementById('phone').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Registering...';
+
+            // Format to E.164
+            const formatToE164 = (phone) => {
+                const digits = phone.replace(/\D/g, '');
+                if (digits.length === 10) return '+1' + digits;
+                if (digits.length === 11 && digits[0] === '1') return '+' + digits;
+                return '+1' + digits;
+            };
+
+            try {
+                const response = await fetch('/api/providers/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': 'PUBLIC_OPTIN'
+                    },
+                    body: JSON.stringify({
+                        phone: formatToE164(phone),
+                        subscriberId: refId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || data.message || 'Registration failed');
+                }
+
+                // Success!
+                if (data.telegram && data.telegram.activationLink) {
+                    document.getElementById('telegramLink').href = data.telegram.activationLink;
+                    const startToken = data.telegram.activationLink.split('start=')[1];
+                    if (startToken) {
+                        document.getElementById('startCode').textContent = '/start ' + startToken;
+                    }
+                }
+
+                document.getElementById('formCard').style.display = 'none';
+                document.getElementById('successCard').classList.add('show');
+
+            } catch (error) {
+                document.getElementById('errorText').textContent = error.message;
+                document.getElementById('errorMessage').classList.add('show');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Register & Activate Telegram';
+            }
+        });
+    </script>
+</body>
+</html>

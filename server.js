@@ -120,6 +120,85 @@ app.get('/api/subscribers/list', async (req, res) => {
   }
 });
 
+// API: Provider Registration
+app.post('/api/providers/register', async (req, res) => {
+  try {
+    const apiKey = req.headers['x-api-key'];
+    if (apiKey !== 'PUBLIC_OPTIN' && apiKey !== process.env.ADMIN_API_KEY) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { phone, subscriberId } = req.body;
+
+    if (!phone || !subscriberId) {
+      return res.status(400).json({ error: 'Phone and subscriberId required' });
+    }
+
+    const subscribers = await getSubscribers();
+    const subscriber = subscribers.find(s => s.id === subscriberId);
+
+    if (!subscriber) {
+      return res.status(404).json({ error: 'Subscriber not found' });
+    }
+
+    // Check if provider already registered
+    const existing = subscribers.find(s => s.phone === phone);
+    
+    if (existing) {
+      return res.status(200).json({
+        success: true,
+        message: 'Already registered',
+        provider: { id: existing.id, firstName: existing.firstName },
+        telegram: {
+          activationLink: `https://t.me/CASResBot?start=${existing.telegramLinkToken}`,
+          instructions: 'Click to activate Telegram alerts'
+        }
+      });
+    }
+
+    // Create new provider subscriber
+    const providerId = `sub_${Date.now()}`;
+    const linkToken = Buffer.from(`${providerId}:${Date.now()}`).toString('base64').replace(/[=+\/]/g, '').substring(0, 16);
+
+    const provider = {
+      id: providerId,
+      firstName: subscriber.providerName.split(' ')[0] || 'Provider',
+      lastName: subscriber.providerName.split(' ').slice(1).join(' ') || '',
+      phone: phone,
+      providerName: `${subscriber.firstName} ${subscriber.lastName}`,
+      providerPhone: subscriber.phone,
+      telegramChatId: null,
+      telegramLinkToken: linkToken,
+      consentGiven: true,
+      consentTimestamp: new Date().toISOString(),
+      consentIp: req.headers['x-forwarded-for'] || req.socket.remoteAddress,
+      status: 'active',
+      source: 'provider_registration',
+      createdAt: new Date().toISOString(),
+      lastCheckInSent: null,
+      lastResponseReceived: null,
+      totalCheckInsSent: 0,
+      totalResponsesReceived: 0
+    };
+
+    subscribers.push(provider);
+    await saveSubscribers(subscribers);
+
+    return res.status(201).json({
+      success: true,
+      provider: { id: provider.id, firstName: provider.firstName },
+      telegram: {
+        activationLink: `https://t.me/CASResBot?start=${linkToken}`,
+        instructions: 'Click to activate Telegram alerts'
+      }
+    });
+
+  } catch (error) {
+    console.error('Provider registration error:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // API: Telegram Webhook
 app.post('/api/telegram/webhook', async (req, res) => {
   try {
