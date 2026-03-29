@@ -261,7 +261,7 @@ app.post('/api/telegram/webhook', async (req, res) => {
         
         // Send copyable message for provider
         await sendTelegramMessage(chatId,
-          `*Copy and paste the following message to ${subscriber.providerName}:*\n\n━━━━━━━━━━━━━━━\n\n📋 Hi ${subscriber.providerName},\n\nI signed up for CasRes wellness check-ins. If you agree to be my emergency contact and receive alerts if I don't respond to check-ins, please click this link:\n\n${providerTelegramLink}\n\nWhen Telegram opens, tap the "START" button to complete registration. That's it!\n\nThanks!\n- ${subscriber.firstName}`
+          `*Copy and paste the following message to ${subscriber.providerName}:*\n\n━━━━━━━━━━━━━━━\n\n📋 Hi ${subscriber.providerName},\n\nI signed up for CasRes wellness check-ins. If you agree to be my emergency contact and receive alerts if I don't respond to check-ins, please click this link:\n\n${providerTelegramLink}\n\nWhen Telegram opens, tap the START button to complete registration. That's it!\n\nThanks!\n- ${subscriber.firstName}`
         );
         return res.status(200).json({ ok: true });
       }
