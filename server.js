@@ -144,10 +144,11 @@ app.post('/api/providers/register', async (req, res) => {
       return res.status(404).json({ error: 'Subscriber not found' });
     }
 
-    // Check if provider already registered
-    const existing = subscribers.find(s => s.phone === phone);
+    // Check if provider already registered FOR THIS SUBSCRIBER
+    const existing = subscribers.find(s => s.phone === phone && s.providerPhone === subscriber.phone);
     
     if (existing) {
+      // Already registered for this subscriber, return existing activation link
       return res.status(200).json({
         success: true,
         message: 'Already registered',
