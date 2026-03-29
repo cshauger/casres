@@ -229,11 +229,25 @@ app.post('/api/telegram/webhook', async (req, res) => {
           `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to CasRes wellness check-ins.\n\n📅 *Daily Check-In Schedule (Pacific Time):*\n• 7:40 PM\n• 7:42 PM\n• 7:44 PM\n\nJust reply with any message to confirm you're doing well.\n\nIf you don't respond to any check-ins, we'll alert ${subscriber.providerName} at 7:46 PM.\n\n💙 You're all set!\n\n━━━━━━━━━━━━━━━\n\n*Copy and paste the following message to ${subscriber.providerName}:*`
         );
         
-        // Create provider record and Telegram link immediately
-        const providerId = `sub_${Date.now()}_provider`;
-        const providerLinkToken = Buffer.from(`${providerId}:${Date.now()}`).toString('base64').replace(/[=+\/]/g, '').substring(0, 16);
+        // Check if provider already exists for this subscriber
+        const allSubs = await getSubscribers();
+        const existingProvider = allSubs.find(p => 
+          p.phone === subscriber.providerPhone && 
+          p.providerPhone === subscriber.phone
+        );
         
-        const providerRecord = {
+        let providerLinkToken, providerTelegramLink;
+        
+        if (existingProvider) {
+          // Provider already exists, reuse their link
+          providerLinkToken = existingProvider.telegramLinkToken;
+          providerTelegramLink = `https://t.me/CASResBot?start=${providerLinkToken}`;
+        } else {
+          // Create new provider record
+          const providerId = `sub_${Date.now()}_provider`;
+          providerLinkToken = Buffer.from(`${providerId}:${Math.random()}`).toString('base64').replace(/[=+\/]/g, '').substring(0, 16);
+          
+          const providerRecord = {
           id: providerId,
           firstName: subscriber.providerName.split(' ')[0] || 'Provider',
           lastName: subscriber.providerName.split(' ').slice(1).join(' ') || '',
@@ -251,13 +265,13 @@ app.post('/api/telegram/webhook', async (req, res) => {
           lastResponseReceived: null,
           totalCheckInsSent: 0,
           totalResponsesReceived: 0
-        };
-        
-        const allSubs = await getSubscribers();
-        allSubs.push(providerRecord);
-        await saveSubscribers(allSubs);
-        
-        const providerTelegramLink = `https://t.me/CASResBot?start=${providerLinkToken}`;
+          };
+          
+          allSubs.push(providerRecord);
+          await saveSubscribers(allSubs);
+          
+          providerTelegramLink = `https://t.me/CASResBot?start=${providerLinkToken}`;
+        }
         
         // Send copyable message for provider
         await sendTelegramMessage(chatId,
