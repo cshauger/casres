@@ -74,7 +74,7 @@ app.post('/api/subscribers/add', async (req, res) => {
     }
     
     const subscriberId = `sub_${Date.now()}`;
-    const linkToken = Buffer.from(`${subscriberId}:${Math.random()}`).toString('base64').replace(/[=+\/]/g, '').substring(0, 16);
+    const linkToken = Buffer.from(`${Math.random()}:${subscriberId}`).toString('base64').replace(/[=+\/]/g, '').substring(0, 16);
 
     const subscriber = {
       id: subscriberId,
@@ -258,7 +258,7 @@ app.post('/api/telegram/webhook', async (req, res) => {
         } else {
           // Create new provider record
           const providerId = `sub_${Date.now()}_provider`;
-          providerLinkToken = Buffer.from(`${providerId}:${Math.random()}`).toString('base64').replace(/[=+\/]/g, '').substring(0, 16);
+          providerLinkToken = Buffer.from(`${Math.random()}:${providerId}`).toString('base64').replace(/[=+\/]/g, '').substring(0, 16);
           
           const providerRecord = {
           id: providerId,
