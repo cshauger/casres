@@ -223,6 +223,18 @@ app.post('/api/telegram/webhook', async (req, res) => {
         subscriber.telegramChatId = chatId.toString();
         await saveSubscribers(subscribers);
         
+        // Check if this is a provider activation (not a subscriber)
+        const isProvider = subscriber.source === 'auto_provider_creation';
+        
+        if (isProvider) {
+          // Provider confirmation message
+          await sendTelegramMessage(chatId,
+            `✅ *Confirmed!*\n\nYou're now registered as an emergency contact for *${subscriber.providerName}*.\n\nYou'll receive alerts via Telegram if ${subscriber.providerName} doesn't respond to their daily wellness check-ins.\n\n💙 Thank you for being there for them!`
+          );
+          return res.status(200).json({ ok: true });
+        }
+        
+        // Regular subscriber welcome message
         const providerLink = `https://casres.com/register?ref=${subscriber.id}`;
         
         await sendTelegramMessage(chatId,
