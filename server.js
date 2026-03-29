@@ -222,7 +222,12 @@ app.post('/api/telegram/webhook', async (req, res) => {
         const providerLink = `https://casres.com/register?ref=${subscriber.id}`;
         
         await sendTelegramMessage(chatId,
-          `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to CasRes wellness check-ins.\n\n📅 *Daily Check-In Schedule (Pacific Time):*\n• 4:40 PM\n• 4:42 PM\n• 4:44 PM\n\nJust reply with any message to confirm you're doing well.\n\nIf you don't respond to any check-ins, we'll alert ${subscriber.providerName} at 4:46 PM.\n\n*🔔 Important: ${subscriber.providerName} needs to register too!*\nShare this link with them: ${providerLink}\n\n💙 You're all set!`
+          `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to CasRes wellness check-ins.\n\n📅 *Daily Check-In Schedule (Pacific Time):*\n• 4:40 PM\n• 4:42 PM\n• 4:44 PM\n\nJust reply with any message to confirm you're doing well.\n\nIf you don't respond to any check-ins, we'll alert ${subscriber.providerName} at 4:46 PM.\n\n💙 You're all set!`
+        );
+        
+        // Send a separate forwardable message for the provider
+        await sendTelegramMessage(chatId,
+          `📨 *Please forward this message to ${subscriber.providerName}:*\n\n━━━━━━━━━━━━━━━\n\nHi ${subscriber.providerName}! 👋\n\n${subscriber.firstName} has signed up for CasRes wellness check-ins and listed you as their caregiver.\n\nTo receive alerts if ${subscriber.firstName} doesn't respond to check-ins, please register here:\n\n${providerLink}\n\nIt only takes 30 seconds to activate Telegram alerts!\n\n━━━━━━━━━━━━━━━`
         );
         return res.status(200).json({ ok: true });
       }
