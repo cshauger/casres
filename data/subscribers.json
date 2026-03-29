@@ -75,5 +75,24 @@
     "lastResponseReceived": null,
     "totalCheckInsSent": 0,
     "totalResponsesReceived": 0
+  },
+  {
+    "id": "sub_1774751873803_provider",
+    "firstName": "Curtis",
+    "lastName": "Shauger",
+    "phone": "+14158065660",
+    "providerName": "Kim Jespersen",
+    "providerPhone": "+19257689020",
+    "telegramChatId": null,
+    "telegramLinkToken": "c3ViXzE3NzQ3NTE4",
+    "consentGiven": true,
+    "consentTimestamp": "2026-03-29T02:37:53.803Z",
+    "status": "active",
+    "source": "auto_provider_creation",
+    "createdAt": "2026-03-29T02:37:53.803Z",
+    "lastCheckInSent": null,
+    "lastResponseReceived": null,
+    "totalCheckInsSent": 0,
+    "totalResponsesReceived": 0
   }
 ]
