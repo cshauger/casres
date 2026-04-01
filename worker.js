@@ -127,13 +127,12 @@ async function runScheduledCheckIns() {
       if (shouldSendCheckIn(checkInTime)) {
         console.log(`Triggering check-in #${checkInTime.number} at ${checkInTime.hour}:${String(checkInTime.minute).padStart(2, '0')} PT`);
         
-        // Send to all active subscribers (NOT providers) with Telegram connected who haven't responded yet today
+        // Send to all active subscribers (NOT providers) with Telegram connected
         for (const sub of subscribers) {
-          if (sub.status === 'active' && 
-              sub.telegramChatId && 
-              sub.source !== 'auto_provider_creation' &&
-              !sub.dailyResponseReceived) {
-            await sendCheckInToSubscriber(sub, checkInTime.number);
+          if (sub.status === 'active' && sub.telegramChatId && sub.source !== 'auto_provider_creation') {
+            // If user responded to previous check-in, restart counter at #1
+            const checkInNumber = sub.dailyResponseReceived ? 1 : checkInTime.number;
+            await sendCheckInToSubscriber(sub, checkInNumber);
           }
         }
       }
