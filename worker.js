@@ -1,6 +1,6 @@
 /**
  * CasRes Background Worker - Production Mode
- * Sends check-ins at scheduled times (12:30 PM, 1:00 PM, 1:30 PM PT)
+ * Sends check-ins at scheduled times (8:00 AM, 2:00 PM, 8:00 PM PT)
  */
 
 import { getSubscribers, saveSubscribers } from './lib/github-storage.js';
@@ -10,9 +10,9 @@ const CHECK_INTERVAL = 30000; // Check every 30 seconds
 
 // Check-in times (Pacific Time)
 const CHECK_IN_TIMES = [
-  { hour: 10, minute: 45, number: 1 },
-  { hour: 10, minute: 47, number: 2 },
-  { hour: 10, minute: 49, number: 3 }
+  { hour: 8, minute: 0, number: 1 },
+  { hour: 14, minute: 0, number: 2 },
+  { hour: 20, minute: 0, number: 3 }
 ];
 
 const lastSentTimes = new Map(); // Track when we last sent each check-in
