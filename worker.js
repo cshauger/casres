@@ -138,21 +138,31 @@ async function runScheduledCheckIns() {
       }
     }
     
-    // After 10:51 AM PT, check for missed check-ins and send alerts
-    const now = getCurrentPacificTime();
-    if (now.getHours() === 10 && now.getMinutes() === 51) {
-      const today = now.toDateString();
-      const alertKey = `alert-${today}`;
+    // Check for alerts: 10 minutes after last check-in, if counter reached #3 and no response
+    const refreshedSubs = await getSubscribers();
+    const now = Date.now();
+    
+    for (const sub of refreshedSubs) {
+      if (sub.status !== 'active' || !sub.telegramChatId || sub.source === 'auto_provider_creation') continue;
       
-      if (!lastSentTimes.has(alertKey)) {
-        lastSentTimes.set(alertKey, Date.now());
+      // Only alert if:
+      // 1. They received check-in #3
+      // 2. No response received
+      // 3. At least 10 minutes have passed since last check-in
+      if (sub.lastCheckInNumber === 3 && 
+          !sub.dailyResponseReceived && 
+          sub.lastCheckInSent) {
+        const lastCheckIn = new Date(sub.lastCheckInSent).getTime();
+        const tenMinutes = 10 * 60 * 1000;
         
-        console.log('Checking for missed check-ins...');
-        const refreshedSubs = await getSubscribers();
-        
-        for (const sub of refreshedSubs) {
-          if (sub.status === 'active' && sub.telegramChatId && !sub.dailyResponseReceived && sub.source !== 'auto_provider_creation') {
-            console.log(`No response from ${sub.firstName} - sending alert`);
+        if (now - lastCheckIn >= tenMinutes) {
+          // Check if we already sent alert today
+          const today = new Date().toDateString();
+          const alertKey = `alert-${sub.id}-${today}`;
+          
+          if (!lastSentTimes.has(alertKey)) {
+            lastSentTimes.set(alertKey, now);
+            console.log(`No response from ${sub.firstName} after check-in #3 - sending alert`);
             await sendAlertToProvider(sub);
           }
         }
