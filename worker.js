@@ -10,9 +10,9 @@ const CHECK_INTERVAL = 30000; // Check every 30 seconds
 
 // Check-in times (Pacific Time)
 const CHECK_IN_TIMES = [
-  { hour: 8, minute: 0, number: 1 },
-  { hour: 14, minute: 0, number: 2 },
-  { hour: 20, minute: 0, number: 3 }
+  { hour: 8, minute: 0 },
+  { hour: 14, minute: 0 },
+  { hour: 20, minute: 0 }
 ];
 
 const lastSentTimes = new Map(); // Track when we last sent each check-in
@@ -51,7 +51,7 @@ function shouldSendCheckIn(checkInTime) {
   if (currentHour === checkInTime.hour && currentMinute === checkInTime.minute) {
     // Check if we already sent this check-in today
     const today = now.toDateString();
-    const key = `${checkInTime.number}-${today}`;
+    const key = `${checkInTime.hour}-${checkInTime.minute}-${today}`;
     
     if (!lastSentTimes.has(key)) {
       lastSentTimes.set(key, Date.now());
@@ -83,6 +83,9 @@ async function sendCheckInToSubscriber(subscriber, checkInNumber) {
     if (checkInNumber === 1) {
       sub.dailyResponseReceived = false;
     }
+    
+    // Increment floating counter for next time
+    sub.currentCheckInLevel = checkInNumber + 1;
     
     await saveSubscribers(subscribers);
   }

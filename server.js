@@ -303,6 +303,11 @@ app.post('/api/telegram/webhook', async (req, res) => {
         subscriber.lastResponseReceived = new Date().toISOString();
         subscriber.totalResponsesReceived = (subscriber.totalResponsesReceived || 0) + 1;
         subscriber.dailyResponseReceived = true; // Mark as responded for today
+        
+        // Reset floating counter on reply
+        subscriber.currentCheckInLevel = 1;
+        subscriber.alertTriggeredForCurrentCycle = false;
+        
         await saveSubscribers(subscribers);
 
         await sendTelegramMessage(chatId,
