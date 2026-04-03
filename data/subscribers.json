@@ -14,14 +14,15 @@
     "status": "active",
     "source": "web_optin",
     "createdAt": "2026-03-29T04:03:02.300Z",
-    "lastCheckInSent": "2026-04-02T21:00:25.454Z",
+    "lastCheckInSent": "2026-04-03T03:00:28.665Z",
     "lastResponseReceived": "2026-04-01T15:00:59.929Z",
-    "totalCheckInsSent": 20,
+    "totalCheckInsSent": 21,
     "totalResponsesReceived": 2,
     "dailyResponseReceived": false,
     "lastAlertSent": "2026-04-02T03:10:56.529Z",
     "totalAlertsSent": 5,
-    "currentCheckInLevel": null
+    "currentCheckInLevel": 2,
+    "lastCheckInNumber": 1
   },
   {
     "id": "sub_1774756988794_provider",
