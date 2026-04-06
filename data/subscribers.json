@@ -15,15 +15,15 @@
     "source": "web_optin",
     "createdAt": "2026-03-29T04:03:02.300Z",
     "lastCheckInSent": "2026-04-06T03:00:04.303Z",
-    "lastResponseReceived": "2026-04-04T05:19:34.729Z",
+    "lastResponseReceived": "2026-04-06T03:35:11.378Z",
     "totalCheckInsSent": 30,
-    "totalResponsesReceived": 3,
-    "dailyResponseReceived": false,
+    "totalResponsesReceived": 4,
+    "dailyResponseReceived": true,
     "lastAlertSent": "2026-04-02T03:10:56.529Z",
     "totalAlertsSent": 5,
-    "currentCheckInLevel": 7,
+    "currentCheckInLevel": 1,
     "lastCheckInNumber": 6,
-    "alertTriggeredForCurrentCycle": true
+    "alertTriggeredForCurrentCycle": false
   },
   {
     "id": "sub_1774756988794_provider",
