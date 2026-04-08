@@ -19,11 +19,11 @@
     "totalCheckInsSent": 37,
     "totalResponsesReceived": 5,
     "dailyResponseReceived": false,
-    "lastAlertSent": "2026-04-08T15:01:09.286Z",
-    "totalAlertsSent": 7,
+    "lastAlertSent": "2026-04-08T15:00:10.783Z",
+    "totalAlertsSent": 6,
     "currentCheckInLevel": 4,
     "lastCheckInNumber": 3,
-    "alertTriggeredForCurrentCycle": false
+    "alertTriggeredForCurrentCycle": true
   },
   {
     "id": "sub_1774756988794_provider",
