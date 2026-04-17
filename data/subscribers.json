@@ -19,8 +19,8 @@
     "totalCheckInsSent": 65,
     "totalResponsesReceived": 23,
     "dailyResponseReceived": false,
-    "lastAlertSent": "2026-04-10T15:00:15.502Z",
-    "totalAlertsSent": 7,
+    "lastAlertSent": "2026-04-17T21:00:28.056Z",
+    "totalAlertsSent": 8,
     "currentCheckInLevel": 4,
     "lastCheckInNumber": 3,
     "alertTriggeredForCurrentCycle": false
