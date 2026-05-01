@@ -10,7 +10,7 @@ const CHECK_INTERVAL = 30000; // Check every 30 seconds
 
 // Check-in times (Pacific Time)
 const CHECK_IN_TIMES = [
-  { hour: 8, minute: 0 },
+  { hour: 9, minute: 5 },
   { hour: 14, minute: 0 },
   { hour: 20, minute: 0 }
 ];
