@@ -126,16 +126,15 @@ async function runScheduledCheckIns() {
     const subscribers = await getSubscribers();
     
     // Check each scheduled time
-    for (let i = 0; i < CHECK_IN_TIMES.length; i++) {
-      const checkInTime = CHECK_IN_TIMES[i];
+    for (const checkInTime of CHECK_IN_TIMES) {
       if (shouldSendCheckIn(checkInTime)) {
         console.log(`Triggering check-in at ${checkInTime.hour}:${String(checkInTime.minute).padStart(2, '0')} PT`);
         
         // Send to all active subscribers (NOT providers) with Telegram connected
         for (const sub of subscribers) {
           if (sub.status === 'active' && sub.telegramChatId && sub.source !== 'auto_provider_creation') {
-            // First check-in of day (9:05 AM) always resets to #1, otherwise use floating counter
-            const nextCheckInNumber = (i === 0) ? 1 : (sub.currentCheckInLevel || 1);
+            // Use floating counter - only resets when user replies
+            const nextCheckInNumber = sub.currentCheckInLevel || 1;
             await sendCheckInToSubscriber(sub, nextCheckInNumber);
           }
         }
