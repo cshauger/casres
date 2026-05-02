@@ -304,8 +304,7 @@ app.post('/api/telegram/webhook', async (req, res) => {
         subscriber.totalResponsesReceived = (subscriber.totalResponsesReceived || 0) + 1;
         subscriber.dailyResponseReceived = true; // Mark as responded for today
         
-        // Reset floating counter on reply
-        subscriber.currentCheckInLevel = 1;
+        // Clear alert flag on reply (counter controlled by worker schedule)
         subscriber.alertTriggeredForCurrentCycle = false;
         
         await saveSubscribers(subscribers);
