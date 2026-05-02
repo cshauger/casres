@@ -133,7 +133,7 @@ async function runScheduledCheckIns() {
         // Send to all active subscribers (NOT providers) with Telegram connected
         for (const sub of subscribers) {
           if (sub.status === 'active' && sub.telegramChatId && sub.source !== 'auto_provider_creation') {
-            // Use floating counter - only resets when user replies
+            // Calculate next check-in number based on floating state
             const nextCheckInNumber = sub.currentCheckInLevel || 1;
             await sendCheckInToSubscriber(sub, nextCheckInNumber);
           }
@@ -143,32 +143,27 @@ async function runScheduledCheckIns() {
     
     const now = getCurrentPacificTime();
     
-    // Check for alerts: 30 minutes after 3rd check-in missed
-    const refreshedSubs = await getSubscribers();
-    let modified = false;
+    // Check for alerts: if someone has reached check-in level 4 (meaning they missed #3)
+    const alertKey = `alert-${now.toDateString()}-${now.getHours()}-${now.getMinutes()}`;
     
-    for (const sub of refreshedSubs) {
-      if (sub.status === 'active' && sub.telegramChatId && sub.source !== 'auto_provider_creation') {
-        // If counter > 3 (3 check-ins missed) and we haven't alerted yet
-        if (sub.currentCheckInLevel > 3 && !sub.alertTriggeredForCurrentCycle) {
-          // Check if 30 minutes have passed since last check-in was sent
-          if (sub.lastCheckInSent) {
-            const lastCheckInTime = new Date(sub.lastCheckInSent);
-            const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000);
-            
-            if (lastCheckInTime <= thirtyMinutesAgo) {
-              console.log(`No response from ${sub.firstName} 30 min after 3rd check-in - sending alert`);
-              await sendAlertToProvider(sub);
-              sub.alertTriggeredForCurrentCycle = true;
-              modified = true;
-            }
+    if (!lastSentTimes.has(alertKey)) {
+      lastSentTimes.set(alertKey, Date.now());
+      const refreshedSubs = await getSubscribers();
+      let modified = false;
+      
+      for (const sub of refreshedSubs) {
+        if (sub.status === 'active' && sub.telegramChatId && sub.source !== 'auto_provider_creation') {
+          if (sub.currentCheckInLevel > 3 && !sub.alertTriggeredForCurrentCycle) {
+             console.log(`No response from ${sub.firstName} after 3 check-ins - sending alert`);
+             await sendAlertToProvider(sub);
+             sub.alertTriggeredForCurrentCycle = true;
+             modified = true;
           }
         }
       }
-    }
-    
-    if (modified) {
-       await saveSubscribers(refreshedSubs);
+      if (modified) {
+         await saveSubscribers(refreshedSubs);
+      }
     }
     
   } catch (error) {
