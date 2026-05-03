@@ -36,10 +36,35 @@ async function sendTelegramMessage(chatId, text) {
 }
 
 function getCurrentPacificTime() {
+  // Get current UTC time
   const now = new Date();
-  // Convert to Pacific Time
-  const pacificTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
-  return pacificTime;
+  
+  // Convert to Pacific Time using Intl.DateTimeFormat
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Los_Angeles',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+  
+  const parts = formatter.formatToParts(now);
+  const getValue = (type) => parts.find(p => p.type === type)?.value;
+  
+  // Build a proper Date object in Pacific time
+  const year = parseInt(getValue('year'));
+  const month = parseInt(getValue('month')) - 1; // JS months are 0-indexed
+  const day = parseInt(getValue('day'));
+  const hour = parseInt(getValue('hour'));
+  const minute = parseInt(getValue('minute'));
+  const second = parseInt(getValue('second'));
+  
+  // Create date with Pacific time values
+  const pacificDate = new Date(year, month, day, hour, minute, second);
+  return pacificDate;
 }
 
 function shouldSendCheckIn(checkInTime) {
