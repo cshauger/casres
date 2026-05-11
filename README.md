@@ -1,4 +1,4 @@
-# CasRes - Elderly Wellness Check-In Service
+# RestEasyCheck - Elderly Wellness Check-In Service
 
 Automated SMS wellness check-ins for elderly subscribers with provider alerts.
 

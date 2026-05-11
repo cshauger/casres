@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     }
 
     // Schedule the full cycle starting NOW
-    const baseUrl = 'https://casres.com';
+    const baseUrl = 'https://resteasycheck.com';
     
     // Trigger all 4 tasks in background
     const tasks = [

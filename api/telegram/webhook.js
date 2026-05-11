@@ -56,7 +56,7 @@ export default async function handler(req, res) {
           await saveSubscribers(subscribers);
           
           // Schedule test check-ins via OpenClaw cron (1, 2, 3, 7 minutes)
-          const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://casres.com';
+          const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://resteasycheck.com';
           const now = Date.now();
           
           try {
@@ -78,7 +78,7 @@ export default async function handler(req, res) {
               const cronPayload = {
                 action: 'add',
                 job: {
-                  name: `CasRes ${schedule.type} #${schedule.number || 'alert'} - ${subscriber.firstName}`,
+                  name: `RestEasyCheck ${schedule.type} #${schedule.number || 'alert'} - ${subscriber.firstName}`,
                   schedule: {
                     kind: 'at',
                     at: executeAt.toISOString()
@@ -106,14 +106,14 @@ export default async function handler(req, res) {
           }
           
           await sendTelegramMessage(chatId,
-            `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to CasRes wellness check-ins.\n\n🧪 *Test Mode:*\nYou'll receive 3 check-ins in the next 3 minutes.\nIf you don't reply "OK", we'll alert ${subscriber.providerName} 1 minute later (4 min total).\n\nJust reply *OK* to any check-in!\n\n💙 Testing in progress...`
+            `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to RestEasyCheck wellness check-ins.\n\n🧪 *Test Mode:*\nYou'll receive 3 check-ins in the next 3 minutes.\nIf you don't reply "OK", we'll alert ${subscriber.providerName} 1 minute later (4 min total).\n\nJust reply *OK* to any check-in!\n\n💙 Testing in progress...`
           );
           return res.status(200).json({ ok: true });
         }
       }
       
       // Regular /start (no token or invalid token)
-      const welcomeMsg = `👋 Hi ${firstName}!\n\nI'm the *CasRes Wellness Check-In Bot*.\n\nTo register for wellness check-ins:\n1. Visit https://casres.com\n2. Complete the enrollment form\n3. Click the Telegram activation link\n   _OR_ send /link to connect manually\n\nReply *OK* to confirm check-ins when you receive them.`;
+      const welcomeMsg = `👋 Hi ${firstName}!\n\nI'm the *RestEasyCheck Wellness Check-In Bot*.\n\nTo register for wellness check-ins:\n1. Visit https://resteasycheck.com\n2. Complete the enrollment form\n3. Click the Telegram activation link\n   _OR_ send /link to connect manually\n\nReply *OK* to confirm check-ins when you receive them.`;
       
       await sendTelegramMessage(chatId, welcomeMsg);
       return res.status(200).json({ ok: true });
@@ -143,7 +143,7 @@ export default async function handler(req, res) {
         );
       } else {
         await sendTelegramMessage(chatId,
-          `❌ No account found for ${telegramUsername}\n\nMake sure you:\n1. Signed up at https://casres.com\n2. Entered your Telegram username (${telegramUsername}) during enrollment\n\nIf you just signed up, try again in a minute.`
+          `❌ No account found for ${telegramUsername}\n\nMake sure you:\n1. Signed up at https://resteasycheck.com\n2. Entered your Telegram username (${telegramUsername}) during enrollment\n\nIf you just signed up, try again in a minute.`
         );
       }
       return res.status(200).json({ ok: true });
@@ -173,7 +173,7 @@ export default async function handler(req, res) {
         console.log(`⟳ ${subscriber.firstName} responded - cycle should reset`);
       } else {
         await sendTelegramMessage(chatId,
-          `I don't have you registered yet.\n\nPlease sign up at https://casres.com and I'll link your account!`
+          `I don't have you registered yet.\n\nPlease sign up at https://resteasycheck.com and I'll link your account!`
         );
       }
       return res.status(200).json({ ok: true });

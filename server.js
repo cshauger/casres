@@ -1,5 +1,5 @@
 /**
- * CasRes - Express.js server for DigitalOcean App Platform
+ * RestEasyCheck - Express.js server for DigitalOcean App Platform
  * Token fix deployed 2026-03-29
  */
 
@@ -236,10 +236,10 @@ app.post('/api/telegram/webhook', async (req, res) => {
         }
         
         // Regular subscriber welcome message
-        const providerLink = `https://casres.com/register?ref=${subscriber.id}`;
+        const providerLink = `https://resteasycheck.com/register?ref=${subscriber.id}`;
         
         await sendTelegramMessage(chatId,
-          `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to CasRes wellness check-ins.\n\n📅 *Daily Check-In Schedule (Pacific Time):*\n• 8:00 AM\n• 2:00 PM\n• 8:00 PM\n\nJust reply with any message to confirm you're doing well.\n\nIf you don't respond to any check-ins, we'll alert ${subscriber.providerName} 10 minutes after the 8:00 PM check-in.\n\n💙 You're all set!\n\n━━━━━━━━━━━━━━━\n\n*Copy and paste the following message to ${subscriber.providerName}:*`
+          `✅ *Welcome ${subscriber.firstName}!*\n\nYour Telegram account is now connected to RestEasyCheck wellness check-ins.\n\n📅 *Daily Check-In Schedule (Pacific Time):*\n• 8:00 AM\n• 2:00 PM\n• 8:00 PM\n\nJust reply with any message to confirm you're doing well.\n\nIf you don't respond to any check-ins, we'll alert ${subscriber.providerName} 10 minutes after the 8:00 PM check-in.\n\n💙 You're all set!\n\n━━━━━━━━━━━━━━━\n\n*Copy and paste the following message to ${subscriber.providerName}:*`
         );
         
         // Check if provider already exists for this subscriber
@@ -288,7 +288,7 @@ app.post('/api/telegram/webhook', async (req, res) => {
         
         // Send copyable message for provider
         await sendTelegramMessage(chatId,
-          `📋 Hi ${subscriber.providerName},\n\nI signed up for CasRes wellness check-ins. If you agree to be my emergency contact and receive alerts if I don't respond to check-ins, please click this link:\n\n${providerTelegramLink}\n\nWhen Telegram opens, tap /start to complete registration. That's it!\n\nThanks!\n- ${subscriber.firstName}`
+          `📋 Hi ${subscriber.providerName},\n\nI signed up for RestEasyCheck wellness check-ins. If you agree to be my emergency contact and receive alerts if I don't respond to check-ins, please click this link:\n\n${providerTelegramLink}\n\nWhen Telegram opens, tap /start to complete registration. That's it!\n\nThanks!\n- ${subscriber.firstName}`
         );
         return res.status(200).json({ ok: true });
       }
@@ -416,7 +416,7 @@ app.get('/api/telegram/alert-provider', async (req, res) => {
       });
     }
 
-    const alertMessage = `⚠️ *WELLNESS ALERT*\n\n${subscriber.firstName} ${subscriber.lastName} has not responded to 3 wellness check-ins.\n\n📱 Phone: ${subscriber.phone}\n⏰ Last check-in sent: ${lastCheckIn ? lastCheckIn.toLocaleString() : 'Unknown'}\n❌ No response received\n\nPlease call ${subscriber.firstName} to verify their wellbeing.\n\n_This is a test alert from CasRes wellness check-in service._`;
+    const alertMessage = `⚠️ *WELLNESS ALERT*\n\n${subscriber.firstName} ${subscriber.lastName} has not responded to 3 wellness check-ins.\n\n📱 Phone: ${subscriber.phone}\n⏰ Last check-in sent: ${lastCheckIn ? lastCheckIn.toLocaleString() : 'Unknown'}\n❌ No response received\n\nPlease call ${subscriber.firstName} to verify their wellbeing.\n\n_This is a test alert from RestEasyCheck wellness check-in service._`;
 
     const providerChatId = '8259734518'; // Curtis for testing
     await sendTelegramMessage(providerChatId, alertMessage);
@@ -471,7 +471,7 @@ app.get('/admin.html', (req, res) => {
 
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🦀 CasRes server running on port ${PORT}`);
+  console.log(`🦀 RestEasyCheck server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`GitHub storage: ${process.env.GITHUB_TOKEN ? '✅' : '❌'}`);
   console.log(`Telegram bot: ${process.env.CASRES_BOT_TOKEN ? '✅' : '❌'}`);

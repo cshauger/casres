@@ -51,7 +51,7 @@ export default async function handler(req, res) {
 
     for (const subscriber of activeSubscribers) {
       try {
-        const message = `🌟 *CasRes Wellness Check-In*
+        const message = `🌟 *RestEasyCheck Wellness Check-In*
 
 Hi ${subscriber.firstName}!
 

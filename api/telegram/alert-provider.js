@@ -66,7 +66,7 @@ ${subscriber.firstName} ${subscriber.lastName} has not responded to 3 wellness c
 
 Please call ${subscriber.firstName} to verify their wellbeing.
 
-_This is a test alert from CasRes wellness check-in service._`;
+_This is a test alert from RestEasyCheck wellness check-in service._`;
 
     // Try to send via Telegram first (if we have provider's chat ID)
     // For now, we'll send to the subscriber's emergency contact or back to Curtis

@@ -1,5 +1,5 @@
 /**
- * CasRes Background Worker - Production Mode
+ * RestEasyCheck Background Worker - Production Mode
  * Sends check-ins at scheduled times (8:00 AM, 2:00 PM, 8:00 PM PT)
  */
 
@@ -198,7 +198,7 @@ async function runScheduledCheckIns() {
 
 // Main worker loop
 async function start() {
-  console.log('🦀 CasRes Production Worker started');
+  console.log('🦀 RestEasyCheck Production Worker started');
   console.log(`Check-in times (Pacific): ${CHECK_IN_TIMES.map(t => `${t.hour}:${String(t.minute).padStart(2, '0')}`).join(', ')}`);
 
   // Run check loop
